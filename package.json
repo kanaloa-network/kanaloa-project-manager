@@ -1,0 +1,39 @@
+{
+  "name": "kanaloa-project-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "serve": "web-dev-server --node-resolve --open --watch",
+    "watch": "tsc --watch"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@lion/button": "^0.18.1",
+    "@lion/core": "^0.24.0",
+    "@lion/form": "^0.15.0",
+    "@lion/input": "^0.18.0",
+    "@lion/option": "^0.5.6",
+    "@lion/select": "^0.17.1",
+    "@lion/select-rich": "^0.31.1",
+    "@lion/ui": "^0.2.0",
+    "@lion/validate-messages": "^0.10.1",
+    "@material/web": "^1.0.0-pre.7",
+    "@vaadin/router": "^1.7.5",
+    "lit": "^2.7.2",
+    "minidenticons": "^3.1.2",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "@web/dev-server": "^0.2.0",
+    "custom-elements-manifest": "^2.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "vaadin": {
+    "disableUsageStatistics": true
+  }
+}

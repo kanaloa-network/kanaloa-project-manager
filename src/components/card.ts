@@ -1,0 +1,114 @@
+import { LitElement, html, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { foreground, Shade } from './common-styles';
+import "./minidenticon";
+
+interface ProjectCardProps {
+    name?: String;
+    description?: String;
+    images?: String[];
+    buttonText?: String;
+}
+
+@customElement('kana-card')
+export class KanaCard extends LitElement {
+
+    @property({ type: String })
+    name?: String;
+    @property({ type: String })
+    description?: String;
+    @property({ type: Array }) 
+    images: String[] = [];
+    @property({ type: String }) 
+    buttonText?: String;
+
+    constructor(props?: ProjectCardProps) {
+        super();
+
+        if (props) {
+            this.name = props.name || this.name;
+            this.description = props.description || this.description;
+            this.images = props.images || this.images;
+            this.buttonText = props.buttonText || this.buttonText;
+        }
+    }
+
+    static get styles() {
+        return [
+            css`
+                :host {
+                    display: block;
+                    background-color: var(--foreground-color);
+                    border-radius: 8px;
+                    padding: 1rem;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    max-width: 300px;
+                    max-height: 500px;
+                    margin-bottom: 1rem;
+                }
+
+                .title-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .description {
+                    height: 4rem;
+                    max-width: 100%;
+                    overflow: scroll;
+                    overflow-wrap: break-word;
+                    position: relative;
+                }
+
+                .description::after {
+                    content: "";
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 2rem;
+                    background-image: linear-gradient(to top, var(--foreground-color), transparent);
+                }
+
+                .images {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                    margin-top: 1rem;
+                    margin-bottom: 1rem;
+                    height: 128px;
+                    justify-content: center;
+                }
+
+                identicon-img {
+                    height: 100%;
+                    border-radius: 8px;
+                    object-fit: cover;
+                }
+
+                kana-button {
+                    display: block;
+                    margin-top: 1rem;
+                }
+            `,
+            foreground(),
+        ];
+    }
+
+    render() {
+        return html`
+            <div class="title-row">
+                <h2>${this.name}</h2>
+                <kana-icon>settings</kana-icon>
+            </div>
+            <div class="description">
+                ${this.description}
+            </div>
+            <div class="images">
+                <identicon-img hash="${this.name}"></identicon-img>
+            </div>
+            <kana-button>${this.buttonText}</kana-button>
+        `;
+    }
+}
