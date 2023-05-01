@@ -8,7 +8,6 @@ import { identicon } from "minidenticons";
 import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
 let Minidenticon = class Minidenticon extends LitElement {
-    hash = 'ayy';
     static get styles() {
         return css `
             img {
@@ -34,6 +33,6 @@ Minidenticon = __decorate([
 ], Minidenticon);
 export { Minidenticon };
 export function genSvgDataSrc(hash) {
-    return `data:image/svg+xml;utf8,${encodeURIComponent(identicon(hash))}`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(identicon(hash || ""))}`;
 }
 //# sourceMappingURL=minidenticon.js.map

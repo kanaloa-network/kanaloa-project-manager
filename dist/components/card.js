@@ -9,17 +9,14 @@ import { customElement, property } from 'lit/decorators.js';
 import { foreground } from './common-styles';
 import "./minidenticon";
 let KanaCard = class KanaCard extends LitElement {
-    name;
-    description;
-    images = [];
-    buttonText;
     constructor(props) {
         super();
         if (props) {
             this.name = props.name || this.name;
             this.description = props.description || this.description;
-            this.images = props.images || this.images;
-            this.buttonText = props.buttonText || this.buttonText;
+            this.images = props.images || this.images || [];
+            this.button = props.button || this.button;
+            this.address = props.address;
         }
     }
     static get styles() {
@@ -31,8 +28,8 @@ let KanaCard = class KanaCard extends LitElement {
                     border-radius: 8px;
                     padding: 1rem;
                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                    max-width: 300px;
-                    max-height: 500px;
+                    width: 270px;
+                    height: 370px;
                     margin-bottom: 1rem;
                 }
 
@@ -80,6 +77,10 @@ let KanaCard = class KanaCard extends LitElement {
                     display: block;
                     margin-top: 1rem;
                 }
+
+                a {
+                    text-decoration: none;
+                }
             `,
             foreground(),
         ];
@@ -94,9 +95,13 @@ let KanaCard = class KanaCard extends LitElement {
                 ${this.description}
             </div>
             <div class="images">
-                <identicon-img hash="${this.name}"></identicon-img>
+                <identicon-img hash="${this.address}"></identicon-img>
             </div>
-            <kana-button>${this.buttonText}</kana-button>
+            <a href="${this.button.link}">
+                <kana-button>
+                    ${this.button.text}
+                </kana-button>
+            </a>
         `;
     }
 };
@@ -110,8 +115,11 @@ __decorate([
     property({ type: Array })
 ], KanaCard.prototype, "images", void 0);
 __decorate([
+    property()
+], KanaCard.prototype, "button", void 0);
+__decorate([
     property({ type: String })
-], KanaCard.prototype, "buttonText", void 0);
+], KanaCard.prototype, "address", void 0);
 KanaCard = __decorate([
     customElement('kana-card')
 ], KanaCard);

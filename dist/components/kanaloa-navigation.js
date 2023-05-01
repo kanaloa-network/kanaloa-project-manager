@@ -22,9 +22,9 @@ KanaNavButton = __decorate([
     customElement("kana-nav-button")
 ], KanaNavButton);
 let KanaloaNavigation = class KanaloaNavigation extends LitElement {
-    opened = false;
     constructor() {
         super();
+        this.opened = false;
     }
     static get styles() {
         return [

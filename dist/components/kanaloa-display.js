@@ -11,7 +11,6 @@ import { createRef, ref } from 'lit/directives/ref.js';
 import "./wallet-info";
 let KanaloaDisplay = class KanaloaDisplay extends LitElement {
     outlet = createRef();
-    router;
     constructor() {
         super();
     }
@@ -45,9 +44,12 @@ let KanaloaDisplay = class KanaloaDisplay extends LitElement {
     render() {
         return html `
             <div class="top-bar">
-                <kana-wallet-info address="0x0000000000000000000000000"></kana-wallet-info>
+                <kana-wallet-info>
+                </kana-wallet-info>
             </div>
-            <kanaloa-outlet ${ref(this.outlet)}></kanaloa-outlet>
+            <kanaloa-outlet 
+                ${ref(this.outlet)}>
+            </kanaloa-outlet>
         `;
     }
 };

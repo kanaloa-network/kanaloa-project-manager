@@ -1,0 +1,67 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "start-server",
+            "type": "shell",
+            "command": "${workspaceFolder}/viewport-framework/launch.sh",
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,"line": 1,
+                            "column": 1,"message": 1
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": { "regexp": "." },
+                        "endsPattern": { "regexp": "." }
+                    }
+                }
+            ]
+        },
+        {
+            "label": "stop-server",
+            "command": "echo ${input:terminate}",
+            "type": "shell"
+        },
+        {
+            "label": "start_dev",
+            "type": "shell",
+            "command": "./start_dev.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": "^$",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "beginsPattern": ".*Starting Anvil and Web-Dev-Server.*",
+                        "endsPattern": ".*Anvil and Web-Dev-Server are ready.*"
+                    }
+                }
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "terminate",
+            "type": "command",
+            "command": "workbench.action.tasks.terminate",
+            "args": "terminateAll"
+        }
+    ]
+}

@@ -5,7 +5,7 @@ import { customElement, property } from "lit/decorators.js";
 @customElement('identicon-img')
 export class Minidenticon extends LitElement {
     @property({ type: String })
-    hash: string = 'ayy';
+    declare hash: string;
     
     static get styles() {
         return css`
@@ -28,5 +28,5 @@ export class Minidenticon extends LitElement {
 }
 
 export function genSvgDataSrc(hash: string): string {
-    return `data:image/svg+xml;utf8,${encodeURIComponent(identicon(hash))}`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(identicon(hash || ""))}`;
 }

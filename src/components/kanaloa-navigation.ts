@@ -19,10 +19,11 @@ class KanaNavButton extends LionButton {
 export default class KanaloaNavigation extends LitElement {
 
     @property({ reflect: true, type: Boolean })
-    opened: boolean = false;
+    declare opened: boolean;
 
     constructor() {
         super();
+        this.opened = false;
     }
 
     static get styles() {

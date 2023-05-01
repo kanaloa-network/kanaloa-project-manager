@@ -28,6 +28,11 @@ const flexifyCss = css `
             flex: 1;
         }
     `;
+export function maxLengthPreprocessor(maxLength = Infinity) {
+    return (value) => {
+        return value.slice(0, maxLength);
+    };
+}
 let KanaForm = class KanaForm extends LionForm {
 };
 KanaForm = __decorate([

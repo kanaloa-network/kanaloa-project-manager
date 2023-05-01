@@ -5,13 +5,15 @@ import { KanaloaOutlet } from './kanaloa-outlet';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { Router } from '@vaadin/router';
 import "./wallet-info";
+import { KanaloaEthers } from 'src/api/kanaloa-ethers';
 
 @customElement('kanaloa-display')
 export class KanaloaDisplay extends LitElement {
 
     outlet: Ref<KanaloaOutlet> = createRef();
+    
     @property()
-    router: Router | undefined;
+    declare router: Router | undefined;
 
     constructor() {
         super();
@@ -49,9 +51,12 @@ export class KanaloaDisplay extends LitElement {
     render() {
         return html`
             <div class="top-bar">
-                <kana-wallet-info address="0x0000000000000000000000000"></kana-wallet-info>
+                <kana-wallet-info>
+                </kana-wallet-info>
             </div>
-            <kanaloa-outlet ${ref(this.outlet)}></kanaloa-outlet>
+            <kanaloa-outlet 
+                ${ref(this.outlet)}>
+            </kanaloa-outlet>
         `;
     }
 }

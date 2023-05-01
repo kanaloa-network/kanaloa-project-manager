@@ -7,12 +7,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { colorVariables } from './components/common-styles';
-import routes from './routes';
+import { routes } from './routes';
 import { Router } from '@vaadin/router';
 import './components/kanaloa-navigation';
 import './components/kanaloa-display';
 import "@material/web/icon/icon.js";
 let KanaloaApp = class KanaloaApp extends LitElement {
+    router;
+    constructor() {
+        super();
+        this.router = new Router();
+    }
     static get styles() {
         return [
             colorVariables,
@@ -25,18 +30,15 @@ let KanaloaApp = class KanaloaApp extends LitElement {
             `
         ];
     }
-    router;
-    constructor() {
-        super();
-        this.router = new Router();
-    }
     firstUpdated() {
         this.router.setRoutes(routes);
     }
     render() {
         return html `
             <kanaloa-navigation opened></kanaloa-navigation>
-            <kanaloa-display .router=${this.router}></kanaloa-display>
+            <kanaloa-display 
+                .router=${this.router} ç
+            </kanaloa-display>
         `;
     }
 };

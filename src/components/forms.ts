@@ -25,6 +25,14 @@ const flexifyCss: CSSResult =
             flex: 1;
         }
     `
+;
+
+export function maxLengthPreprocessor(maxLength: number = Infinity) {
+    return (value: string) => {
+        return value.slice(0, maxLength);
+    }
+}
+
 
 @customElement("kana-form")
 export class KanaForm extends LionForm {

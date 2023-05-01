@@ -6,20 +6,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { when } from 'lit/directives/when.js';
+import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
 import { genSvgDataSrc } from './minidenticon';
 let KanaWalletInfo = class KanaWalletInfo extends LitElement {
-    _address;
-    get address() {
-        return this._address;
+    _imageUrl;
+    _computedIcon;
+    get imageUrl() {
+        return this._imageUrl || this._computedIcon;
     }
-    set address(addr) {
-        this._address = addr;
-        if (!this.imageUrl) {
-            this.imageUrl =
-                genSvgDataSrc(this._address);
-        }
+    set imageUrl(img) {
+        this._imageUrl = img;
     }
-    imageUrl;
     constructor(address) {
         super();
     }
@@ -35,6 +33,7 @@ let KanaWalletInfo = class KanaWalletInfo extends LitElement {
                 border-radius: 50%;
                 object-fit: cover;
                 margin-right: 8px;
+                background-color: var(--foreground-color);
             }
             .wallet-address {
                 display: inline-block;
@@ -45,23 +44,42 @@ let KanaWalletInfo = class KanaWalletInfo extends LitElement {
             }
         `;
     }
+    connectedCallback() {
+        super.connectedCallback();
+        GlobalKanaloaEthers.subscribe(this);
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        GlobalKanaloaEthers.unsubscribe(this);
+    }
+    requestUpdate() {
+        super.requestUpdate();
+        const addr = GlobalKanaloaEthers.address?.toString();
+        if (this._imageUrl == undefined) {
+            this._computedIcon = (addr) ? genSvgDataSrc(addr) : undefined;
+        }
+    }
     render() {
-        const abridgedAddress = `${this.address?.slice(0, 6)}...${this.address?.slice(-4)}`;
-        return html `
-            <img class="wallet-img" 
-                src="${this.imageUrl}" 
-                alt="Wallet icon" />
-            <span class="wallet-address">${abridgedAddress}</span>
-            <kana-icon>menu</kana-icon>
-        `;
+        const address = GlobalKanaloaEthers.address?.toString();
+        const abridgedAddress = (address != undefined) ?
+            `${address.slice(0, 6)}...${address.slice(-4)}`
+            : undefined;
+        return when(abridgedAddress == undefined, () => html `
+                <kana-button 
+                    @click=${() => GlobalKanaloaEthers.requestSigner()}>
+                    Connect wallet
+                </kana-button>
+            `, () => html `
+                <img class="wallet-img" 
+                    src="${this.imageUrl}" 
+                    alt="Wallet icon" />
+                <span class="wallet-address">${abridgedAddress}</span>
+                <kana-icon>menu</kana-icon>`);
     }
 };
 __decorate([
     property({ type: String })
-], KanaWalletInfo.prototype, "address", null);
-__decorate([
-    property({ type: String })
-], KanaWalletInfo.prototype, "imageUrl", void 0);
+], KanaWalletInfo.prototype, "imageUrl", null);
 KanaWalletInfo = __decorate([
     customElement('kana-wallet-info')
 ], KanaWalletInfo);

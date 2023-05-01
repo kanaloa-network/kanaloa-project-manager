@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "serve": "web-dev-server --node-resolve --open --watch",
+    "serve": "webpack serve --config webpack.config.js",
     "watch": "tsc --watch"
   },
   "keywords": [],
@@ -22,13 +22,18 @@
     "@lion/validate-messages": "^0.10.1",
     "@material/web": "^1.0.0-pre.7",
     "@vaadin/router": "^1.7.5",
+    "ethers": "^6.3.0",
     "lit": "^2.7.2",
     "minidenticons": "^3.1.2",
     "typescript": "^5.0.4"
   },
   "devDependencies": {
-    "@web/dev-server": "^0.2.0",
-    "custom-elements-manifest": "^2.0.0"
+    "custom-elements-manifest": "^2.0.0",
+    "html-webpack-plugin": "^5.5.1",
+    "ts-loader": "^9.4.2",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2",
+    "webpack-dev-server": "^4.13.3"
   },
   "author": "",
   "license": "ISC",

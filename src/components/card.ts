@@ -1,26 +1,34 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, HTMLTemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { foreground, Shade } from './common-styles';
 import "./minidenticon";
+
+interface ButtonProps {
+    link?: string;
+    text: string;
+}
 
 interface ProjectCardProps {
     name?: String;
     description?: String;
     images?: String[];
-    buttonText?: String;
+    button?: ButtonProps;
+    address?: string;
 }
 
 @customElement('kana-card')
 export class KanaCard extends LitElement {
 
     @property({ type: String })
-    name?: String;
+    declare name?: String;
     @property({ type: String })
-    description?: String;
+    declare description?: String;
     @property({ type: Array }) 
-    images: String[] = [];
+    declare images: String[];
+    @property() 
+    declare button: ButtonProps;
     @property({ type: String }) 
-    buttonText?: String;
+    declare address?: string;
 
     constructor(props?: ProjectCardProps) {
         super();
@@ -28,8 +36,9 @@ export class KanaCard extends LitElement {
         if (props) {
             this.name = props.name || this.name;
             this.description = props.description || this.description;
-            this.images = props.images || this.images;
-            this.buttonText = props.buttonText || this.buttonText;
+            this.images = props.images || this.images || [];
+            this.button = props.button || this.button;
+            this.address = props.address;
         }
     }
 
@@ -42,8 +51,8 @@ export class KanaCard extends LitElement {
                     border-radius: 8px;
                     padding: 1rem;
                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                    max-width: 300px;
-                    max-height: 500px;
+                    width: 270px;
+                    height: 370px;
                     margin-bottom: 1rem;
                 }
 
@@ -91,6 +100,10 @@ export class KanaCard extends LitElement {
                     display: block;
                     margin-top: 1rem;
                 }
+
+                a {
+                    text-decoration: none;
+                }
             `,
             foreground(),
         ];
@@ -106,9 +119,13 @@ export class KanaCard extends LitElement {
                 ${this.description}
             </div>
             <div class="images">
-                <identicon-img hash="${this.name}"></identicon-img>
+                <identicon-img hash="${this.address}"></identicon-img>
             </div>
-            <kana-button>${this.buttonText}</kana-button>
+            <a href="${this.button.link}">
+                <kana-button>
+                    ${this.button.text}
+                </kana-button>
+            </a>
         `;
     }
 }
