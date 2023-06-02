@@ -18,6 +18,7 @@ export class KanaWalletInfo extends LitElement {
 
     constructor(address: String) {
         super();
+        GlobalKanaloaEthers.subscribe(this);
     }
 
     static get styles() {
@@ -42,11 +43,6 @@ export class KanaWalletInfo extends LitElement {
                 margin-left: 8px;
             }
         `;
-    }
-
-    connectedCallback(): void {
-        super.connectedCallback();
-        GlobalKanaloaEthers.subscribe(this);
     }
 
     disconnectedCallback(): void {
