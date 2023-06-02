@@ -7,7 +7,7 @@ import '../components/loader';
 import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
 import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
-import { Contract } from 'ethers';
+import { AddressLike, Contract } from 'ethers';
 import { AbstractCardsPage } from './abstract-cards-page';
 
 
@@ -33,22 +33,27 @@ export class ContractsPage extends AbstractCardsPage {
             GlobalKanaloaEthers.wallet
         );
 
-            // // NOTE/TODO: The most innefficient way to do this
-            // // Move to a subgraph and a Promise.all in production
-            // if (await proj.balanceOf(GlobalKanaloaEthers.address) != 0) {
-            //     const address: string = project[0];
-            //     const name: string = await proj.name();
-            //     response.push(new KanaCard({
-            //         name: name,
-            //         button: {
-            //             text: "Contracts",
-            //             link: `/projects/${address}`
-            //         },
-            //         address: address,
-            //         description: project[3]
-            //     }))
-            // }
-            //}
+        // NOTE/TODO: The most innefficient way to do this
+        // Move to a subgraph and a Promise.all in production
+        let length: number = await project.contractsRepositoryLength();
+        if (length != 0) {
+            let contracts: AddressLike[] = await project.getContracts(0, length);
+            for (let address of contracts) {
+                // NOTE: "name()" should be defined as a Standard "Nameable" interface
+                // Consider writing a contract metadata repo module too 
+                const name: string = await proj.name();
+
+            }
+            response.push(new KanaCard({
+                name: name,
+                button: {
+                    text: "Contracts",
+                    link: `/contracts/${address}`
+                },
+                address: address,
+                description: project[3]
+            }))
+        }
 
         this.isLoading = false;
         this.items = response;
