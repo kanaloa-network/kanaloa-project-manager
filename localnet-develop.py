@@ -24,12 +24,14 @@ def run_nix_develop_shell(directory, command, output=subprocess.DEVNULL):
 # Signal handler function to handle Ctrl-C signal
 def gen_signal_handler(child_processes):
     def signal_handler(sig, frame):
-        print("\nCtrl-C received. Terminating child processes...")
+        print("\nTerminating child processes...")
         for process in child_processes:
             try:
                 os.kill(process.pid, signal.SIGTERM)
             except ProcessLookupError:
                 pass
+        print("All processes terminated. Exiting.")
+        os.system("stty sane")
         sys.exit(0)
     return signal_handler
 
