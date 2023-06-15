@@ -9,7 +9,7 @@ export default {
   devServer: {
     port: 8000,
     static: "./",
-    open: true,
+    open: false,
   },
   module: {
     rules: [
