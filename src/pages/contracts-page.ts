@@ -28,10 +28,15 @@ export class ContractsPage extends AbstractCardsPage {
             [
                 "function balanceOf(address owner) view returns (uint256 balance)",
                 "function name() view returns (string)",
-                "function symbol() view returns (string)"
+                "function symbol() view returns (string)",                
+                "function contractsRepositoryLength() view returns (uint256)"
             ],
             GlobalKanaloaEthers.wallet
         );
+
+        const contractAbi: string[] = [
+            "function name() view returns (string)",
+        ]
 
         // NOTE/TODO: The most innefficient way to do this
         // Move to a subgraph and a Promise.all in production
@@ -41,18 +46,24 @@ export class ContractsPage extends AbstractCardsPage {
             for (let address of contracts) {
                 // NOTE: "name()" should be defined as a Standard "Nameable" interface
                 // Consider writing a contract metadata repo module too 
-                const name: string = await proj.name();
+                const contract: Contract = new Contract(
+                    address as string,
+                    contractAbi,
+                    GlobalKanaloaEthers.wallet
+                );
 
+                const name: string = await contract.name();
+                response.push(new KanaCard({
+                    name: name,
+                    button: {
+                        text: "Contracts",
+                        link: `/contracts/${address}`
+                    },
+                    address: address as string,
+                    description: "" // this should be the list of modules
+                }));
             }
-            response.push(new KanaCard({
-                name: name,
-                button: {
-                    text: "Contracts",
-                    link: `/contracts/${address}`
-                },
-                address: address,
-                description: project[3]
-            }))
+            
         }
 
         this.isLoading = false;
@@ -75,7 +86,7 @@ export class ContractsPage extends AbstractCardsPage {
                     )
                 }
             </div>
-            <a href="new-project">
+            <a href="${this.address}/new-contract">
                 <kana-button>Create new contract</kana-button>
             </a>
         `;

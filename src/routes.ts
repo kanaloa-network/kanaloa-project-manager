@@ -58,6 +58,27 @@ export const routes: Route[] = [
         contractsPage.address = ctx.params.address as string;
         return contractsPage;
       }
+  },
+  {
+    path: "/projects/:address/new-contract",
+    component: "contracts-page",
+    action: 
+      async (ctx, cmd) => {
+        const proj = new Contract(
+          ctx.params.address as string,
+          [
+              "function name() view returns (string)",
+          ],
+          GlobalKanaloaEthers.wallet
+        );
+
+        const projectName: string = await proj.name();
+        const contractsPage = 
+          (cmd.component("contracts-page") as unknown as ContractsPage);
+        contractsPage.name = `New contract for ${projectName}`;
+        contractsPage.address = ctx.params.address as string;
+        return contractsPage;
+      }
   }
   // { path: '/team', component: 'team-page' },
   // { path: '/about', component: 'about-page' },
