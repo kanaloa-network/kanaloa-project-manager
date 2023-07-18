@@ -223,7 +223,7 @@ export class NewProjectPage extends LitElement {
                         </div>
                         <div class="form-row">
                             <kana-select
-                                labe-sr-only="Visibility"
+                                label-sr-only="Visibility"
                                 name="visibility"
                                 placeholder="Visibility"
                                 .validators=${[ new Required() ]}
