@@ -94,6 +94,7 @@ export class NewProjectPage extends LitElement {
 
                 select {
                     padding: 10px;
+                    padding-right: 2rem;
                     border: none;
                     border-radius: 5px;
                     background-color: var(--primary-color);
