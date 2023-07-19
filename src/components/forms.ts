@@ -17,7 +17,7 @@ const flexifyCss: CSSResult =
         }
 
         /* Can't believe ING would make something so ugly */
-        .input-group, 
+        .input-group,
         .form-field__group-two, 
         .input-group__container, 
         .input-group__input,
@@ -36,7 +36,17 @@ export function maxLengthPreprocessor(maxLength: number = Infinity) {
 
 @customElement("kana-form")
 export class KanaForm extends LionForm {
-
+    static override get styles() {
+        return [
+            flexifyCss,
+            css`
+                ::slotted(form), .input-group * {
+                    flex: 1;
+                }
+                
+            `
+        ]
+    }
 }
 
 @customElement("kana-input")

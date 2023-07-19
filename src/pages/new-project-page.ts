@@ -117,6 +117,11 @@ export class NewProjectPage extends LitElement {
                     font-size: 1.2rem;
                     min-height: 3rem;
                 }
+
+                kana-windowlet {
+                    max-width: 32rem;
+                    flex: 0 1 auto;
+                }
             `,
             // There has to be a better place to put this, but I will figure 
             // that out later
