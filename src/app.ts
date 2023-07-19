@@ -38,7 +38,8 @@ export class KanaloaApp extends LitElement {
         return html`
             <kanaloa-navigation opened></kanaloa-navigation>
             <kanaloa-display 
-                .router=${this.router} ç
+                .router=${this.router}
+            >
             </kanaloa-display>
         `;
     }
