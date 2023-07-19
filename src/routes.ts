@@ -3,9 +3,11 @@ import { BaseRoute, ComponentResult, Route } from '@vaadin/router';
 import './pages/projects-page';
 import './pages/new-project-page';
 import './pages/contracts-page';
+import './pages/new-contract-page';
 import { GlobalKanaloaEthers } from './api/kanaloa-ethers';
 import { Contract } from 'ethers';
 import { ContractsPage } from './pages/contracts-page';
+import { NewContractPage } from './pages/new-contract-page';
 // import './pages/not-found-page';
 
 interface RouteExtended extends BaseRoute {
@@ -61,7 +63,7 @@ export const routes: Route[] = [
   },
   {
     path: "/projects/:address/new-contract",
-    component: "contracts-page",
+    component: "new-contract-page",
     action: 
       async (ctx, cmd) => {
         const proj = new Contract(
@@ -74,8 +76,8 @@ export const routes: Route[] = [
 
         const projectName: string = await proj.name();
         const contractsPage = 
-          (cmd.component("contracts-page") as unknown as ContractsPage);
-        contractsPage.name = `New contract for ${projectName}`;
+          (cmd.component("new-contract-page") as unknown as NewContractPage);
+        contractsPage.name = `${projectName}`;
         contractsPage.address = ctx.params.address as string;
         return contractsPage;
       }
