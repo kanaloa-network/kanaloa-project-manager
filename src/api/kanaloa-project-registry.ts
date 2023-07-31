@@ -23,7 +23,7 @@ export interface ProjectConfigProps {
 
 function getRegistryContract(provider: Signer | AbstractProvider): Contract {
     return new Contract(
-        PROJECT_REGISTRY_ADDRESS, 
+        PROJECT_REGISTRY_ADDRESS,
         PROJECT_REGISTRY_ABI, 
         provider
     )

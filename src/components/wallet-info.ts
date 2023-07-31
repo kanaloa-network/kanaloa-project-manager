@@ -75,7 +75,7 @@ export class KanaWalletInfo extends LitElement {
             `,
             () => html`
                 <img class="wallet-img" 
-                    src="${this.imageUrl}" 
+                    src="${this.imageUrl as string}" 
                     alt="Wallet icon" />
                 <span class="wallet-address">${abridgedAddress}</span>
                 <kana-icon>menu</kana-icon>`
