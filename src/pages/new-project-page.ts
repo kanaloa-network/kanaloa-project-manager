@@ -238,7 +238,7 @@ export class NewProjectPage extends LitElement {
                                     <option 
                                         hidden
                                         selected
-                                        value
+                                        value=""
                                     >
                                         Visibility
                                     </option>
