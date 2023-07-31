@@ -30,6 +30,31 @@ export const colorVariables = css`
     }
 `;
 
+export const headerStyles = css`
+    h1 {
+        font-size: 3rem;
+        display: block;
+        width: 100%;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin: 0.5rem 0 0.5rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    hr {
+        border: none;
+        height: 2px;
+        background-color: var(--background-light-color);
+        margin: 0.5rem 0 1rem;
+    }
+`;
+
 /* NOTE: despite the spooky "unsafeCSS" name, it's actually safe in this context */
 
 export function interactiveComponent(shade: Shade = Shade.VANILLA): CSSResult {
