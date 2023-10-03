@@ -10,6 +10,7 @@ export default {
     port: 8000,
     static: "./",
     open: false,
+    historyApiFallback: true
   },
   module: {
     rules: [
@@ -17,6 +18,10 @@ export default {
         test: /\.ts$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/i,
+        use: ["css-loader"],
       },
     ],
   },
@@ -26,6 +31,7 @@ export default {
   output: {
     filename: 'bundle.js',
     path: path.resolve('dist'),
+    publicPath: "/"
   },
   plugins: [
     new HtmlWebpackPlugin({

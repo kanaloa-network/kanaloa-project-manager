@@ -79,6 +79,7 @@ export const routes: Route[] = [
           (cmd.component("new-contract-page") as unknown as NewContractPage);
         contractsPage.name = `${projectName}`;
         contractsPage.address = ctx.params.address as string;
+        contractsPage.expandedMode = false;
         return contractsPage;
       }
   }
