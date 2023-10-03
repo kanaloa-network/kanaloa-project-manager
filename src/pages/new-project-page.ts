@@ -4,7 +4,7 @@ import "../components/forms/forms"
 import "../components/windowlet"
 import { MinMaxLength, Required } from "@lion/form-core"
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
-import { KanaForm, maxLengthPreprocessor } from '../components/forms/forms';
+import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
 import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
 
 @customElement('new-project-page')
