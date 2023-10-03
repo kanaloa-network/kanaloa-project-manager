@@ -27,6 +27,8 @@ const commonButtonCss: CSSResult[] = [
 
 @customElement("kana-button")
 export class KanaButton extends LionButton {
+    static formAssociated = true;
+    
     static override get styles() {
         return [
             ...super.styles,
@@ -37,10 +39,19 @@ export class KanaButton extends LionButton {
 
 @customElement("kana-button-submit")
 export class KanaButtonSubmit extends LionButtonSubmit {
+    static formAssociated = true;
+    private internals?: ElementInternals;
+
+    constructor() {
+        super();
+
+    }
+
     static override get styles() {
         return [
             ...super.styles,
             ...commonButtonCss
         ];
     }
+
 }

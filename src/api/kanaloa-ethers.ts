@@ -1,7 +1,8 @@
 import { 
-    AbstractProvider, Eip1193Provider, BrowserProvider, ethers, Signer, AddressLike 
+    AbstractProvider, Eip1193Provider, BrowserProvider, 
+    ethers, Signer, AddressLike, EnsResolver
 } from "ethers";
-import { AvatarResult } from "ethers/types/providers/ens-resolver";
+import { AvatarResult } from "ethers/lib.commonjs/providers/ens-resolver";
 import { LitElement } from "lit";
 import { ProjectRegistry } from "./kanaloa-project-registry";
 

@@ -1,10 +1,10 @@
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import "../components/forms"
+import "../components/forms/forms"
 import "../components/windowlet"
 import { MinMaxLength, Required } from "@lion/form-core"
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
-import { KanaForm, maxLengthPreprocessor } from '../components/forms';
+import { KanaForm, maxLengthPreprocessor } from '../components/forms/forms';
 import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
 
 @customElement('new-project-page')
@@ -27,7 +27,7 @@ export class NewProjectPage extends LitElement {
                     align-items: center;
                     gap: 2rem;
                     padding: 1rem;
-                    flex: 1;
+                    flex: 1 1 0%;
                 }
 
                 h1 {
@@ -256,7 +256,9 @@ export class NewProjectPage extends LitElement {
                             </kana-select>
                         </div>
                         <div class="form-row">
-                            <kana-button-submit>Deploy new project</kana-button-submit>
+                            <kana-button-submit>
+                                Deploy new project
+                            </kana-button-submit>
                         </div>
                     </form>
                 </kana-form>

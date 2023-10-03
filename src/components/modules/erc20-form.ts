@@ -1,12 +1,20 @@
 import { customElement } from "lit/decorators.js";
 import { ModuleForm } from "./commons";
 import { html } from "lit";
-import { Required, maxLengthPreprocessor, maxNumberPreprocessor } from "../forms";
+import { Required, maxLengthPreprocessor, maxNumberPreprocessor } from "../forms/forms";
 import { MinMaxLength, MinNumber, MaxNumber } from "@lion/form-core";
 import { MaxUint256 } from "ethers";
+import "../forms/pulpito/pulpito-input";
 
-@customElement('erc20-form')
+export const ERC20_FORM_TAG = 'erc20-form';
+@customElement(ERC20_FORM_TAG)
 export class ERC20Form extends ModuleForm {
+    static formAssociated = true;
+
+    constructor() {
+        super();
+        
+    }
 
     render() {
         return html`
@@ -64,6 +72,9 @@ export class ERC20Form extends ModuleForm {
                     min="0"
                     max="32"
                 ></kana-input-stepper>
+                <pulpito-input type="select">
+                    <option>test</option>
+                </pulpito-input>
             </div>
         `;
     }

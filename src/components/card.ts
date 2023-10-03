@@ -2,6 +2,7 @@ import { LitElement, html, css, HTMLTemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { foreground, Shade } from './common-styles';
 import "./minidenticon";
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 interface ButtonProps {
     link?: string;
@@ -119,9 +120,10 @@ export class KanaCard extends LitElement {
                 ${this.description}
             </div>
             <div class="images">
-                <identicon-img hash="${this.address}"></identicon-img>
+                <identicon-img hash="${ifDefined(this.address)}">
+                </identicon-img>
             </div>
-            <a href="${this.button.link}">
+            <a href="${ifDefined(this.button.link)}">
                 <kana-button>
                     ${this.button.text}
                 </kana-button>
