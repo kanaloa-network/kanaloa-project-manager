@@ -24,12 +24,13 @@
     "@lion/validate-messages": "^0.10.1",
     "@material/web": "^1.0.0-pre.7",
     "@vaadin/router": "^1.7.5",
-    "ethers": "^6.3.0",
+    "ethers": "^6.7.1",
     "lit": "^2.7.2",
     "minidenticons": "^3.1.2",
     "typescript": "^5.0.4"
   },
   "devDependencies": {
+    "css-loader": "^6.8.1",
     "custom-elements-manifest": "^2.0.0",
     "html-webpack-plugin": "^5.5.1",
     "ts-loader": "^9.4.2",

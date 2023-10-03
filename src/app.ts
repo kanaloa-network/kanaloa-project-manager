@@ -8,6 +8,9 @@ import './components/kanaloa-navigation';
 import './components/kanaloa-display';
 import "@material/web/icon/icon.js";
 
+import reseter from "../css/reseter.module.css";
+import materialIcons from "../css/material-icons.module.css";
+
 @customElement('kanaloa-app')
 export class KanaloaApp extends LitElement {
     router: Router;
@@ -45,5 +48,17 @@ export class KanaloaApp extends LitElement {
     }
 }
 
+// Forgive me, Terry, for I have sinned
+(() => {
+    const tag = document.createElement("style");
+    tag.innerText = `
+        html, body {
+            height: 100%;
+        }
+        ${reseter}
+        ${materialIcons}
+    `;
+    document.head.appendChild(tag);
+})();
 
 document.querySelector('body')?.appendChild(new KanaloaApp());
