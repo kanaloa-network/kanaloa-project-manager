@@ -5,7 +5,7 @@ import "../components/windowlet";
 import { MinMaxLength } from "@lion/form-core";
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
 import { 
-    KanaForm, KanaSelect, KanaInput, KanaFieldset, Required, 
+    KanaForm, KanaSelect, KanaInput, Required, 
     formCssCommon, maxLengthPreprocessor 
 } from '../components/forms/forms';
 import { ModuleForm, ModuleParams } from '../components/modules/commons';
