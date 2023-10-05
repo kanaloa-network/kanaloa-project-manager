@@ -4,6 +4,7 @@ import './pages/profile-page';
 import './pages/projects-page';
 import './pages/new-project-page';
 import './pages/contracts-page';
+import './pages/edit-project-page';
 import './pages/new-contract-page';
 import { GlobalKanaloaEthers } from './api/kanaloa-ethers';
 import { Contract } from 'ethers';
@@ -43,6 +44,11 @@ export const routes: Route[] = [
     path: "/profile",
     component: "profile-page",
     name: "Profile"
+  },
+  { 
+    path: "/PROJECT_ID_OR_SIMILAR",
+    component: "edit-project-page",
+    name: "Edit Project"
   },
   ...(navRoutes as Route[]),
   {
