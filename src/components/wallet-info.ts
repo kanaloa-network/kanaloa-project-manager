@@ -39,6 +39,10 @@ export class KanaWalletInfo extends LitElement {
                 display: inline-block;
                 font-family: monospace;
             }
+			.menu-link {
+				text-decoration: none;
+				color: inherit;
+			}
             kana-icon {
                 margin-left: 8px;
             }
@@ -78,7 +82,9 @@ export class KanaWalletInfo extends LitElement {
                     src="${this.imageUrl as string}" 
                     alt="Wallet icon" />
                 <span class="wallet-address">${abridgedAddress}</span>
-                <kana-icon>menu</kana-icon>`
+				<a href="profile" class="menu-link">
+					<kana-icon>menu</kana-icon>
+				</a>`
         );
     }
 }

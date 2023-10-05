@@ -1,5 +1,6 @@
 import { BaseRoute, ComponentResult, Route } from '@vaadin/router';
 //import './pages/home-page';
+import './pages/profile-page';
 import './pages/projects-page';
 import './pages/new-project-page';
 import './pages/contracts-page';
@@ -30,7 +31,6 @@ export const navRoutes: RouteExtended[] = [
     name: "New project",
     icon: "add_box"
   }
-  
 ];
 
 export const routes: Route[] = [
@@ -38,6 +38,11 @@ export const routes: Route[] = [
     path: '/', 
     component: "home-page", 
     name: "HOME" 
+  },
+  { 
+    path: "/profile",
+    component: "profile-page",
+    name: "Profile"
   },
   ...(navRoutes as Route[]),
   {
