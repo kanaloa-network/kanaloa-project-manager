@@ -171,6 +171,37 @@ export class PulpitoInput extends PulpitoBase {
     }
   }
 
+  constructor() {
+    super();
+    this.elementInternals = this.attachInternals();
+
+    this.attachShadow({ mode: "open" });
+  }
+
+  connectedCallback() {
+    this.shadowRoot!.innerHTML = "";
+    this.shadowRoot!.append(this.inputElement!);
+    this.dispatchEvent(new CustomEvent("input-connected", {
+      detail: this
+    }));
+  }
+
+  disconnectedCallback() {
+    this.dispatchEvent(new CustomEvent("input-disconnected", {
+      detail: this
+    }));
+  }
+
+  attributeChangedCallback<K extends keyof this>(
+    name: K, oldValue: string, newValue: string
+  ): void {
+    if (oldValue == newValue) {
+      return;
+    }
+    
+    this[name] = newValue as this[K];
+  }
+
   render() {
     this.inputElement!.setAttribute("name", this.name || "");
     this.inputElement![
