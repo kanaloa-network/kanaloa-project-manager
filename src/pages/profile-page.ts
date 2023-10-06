@@ -76,7 +76,8 @@ export class ProfilePage extends AbstractCardsPage {
 				.card-title {
 					font-size: 18px;
 				}
-
+			`,
+			css`
 				.profile-card {
 
 				}
@@ -206,7 +207,39 @@ export class ProfilePage extends AbstractCardsPage {
 						flex-direction: column;
 					}
 				}
+			`,
+			css`
+                .form-row lion-validation-feedback {
+                    position: absolute;
+                    background-color: var(--highlighted-light-color);
+                    color: var(--background-color);
+                    padding: 10px;
+                    border-radius: 10px;
+                    display: inline-block;
+                    max-width: 12rem;
+                    font-size: 0.8rem;
+                    line-height: 1.2;
+                    bottom: 2rem;
+                    margin-left: -3rem;
+                    width: max-content;
+                    z-index: 1
+                }
 
+                .form-row lion-validation-feedback:not([type="error"]) {
+                    display: none;
+                }
+                
+                .form-row lion-validation-feedback::before {
+                    content: '';
+                    position: absolute;
+                    bottom: -18px;
+                    left: 10%;
+                    margin-left: -10px;
+                    border: 10px solid transparent;
+                    border-top: 15px solid var(--highlighted-light-color);
+                }
+            `,
+			css`
 				.overview-card {
 					max-width: 300px;
 					min-height: 400px;
@@ -215,7 +248,8 @@ export class ProfilePage extends AbstractCardsPage {
 						max-width: none;
 					}
 				}
-
+			`,
+			css`
 				.project-card {
 					
 				}
@@ -223,7 +257,8 @@ export class ProfilePage extends AbstractCardsPage {
 				.project-container {
 
 				}
-
+			`,
+			css`
 				.role-card {
 					
 				}
@@ -231,7 +266,8 @@ export class ProfilePage extends AbstractCardsPage {
 				.role-container {
 
 				}
-
+			`,
+			css`
 				.button-container {
 					display: flex;
 					flex-direction: row;

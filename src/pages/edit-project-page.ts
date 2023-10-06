@@ -11,7 +11,6 @@ import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
 import { MinMaxLength, Required } from "@lion/form-core";
 
-
 @customElement('edit-project-page')
 export class EditProjectPage extends AbstractCardsPage {
 	constructor() {
@@ -78,22 +77,21 @@ export class EditProjectPage extends AbstractCardsPage {
 					border-radius: 3px;
 					margin: 0;
 				}
-
-
-
-
-
-
+			`,
+			css`
 				.left-container {
 					display: flex;
 					flex-direction: column;
-					gap: 30px;
+					gap: 40px;
+					width: 70%;
 				}
-
+			`,
+			css`
 				.project-container {
 					display: flex;
 					flex-direction: column;
 					gap: 30px;
+					height: 100%;
 				}
 
 				.project-title {
@@ -141,44 +139,117 @@ export class EditProjectPage extends AbstractCardsPage {
 				.existing-role-element-selected {
 					background-color: var(--highlighted-color);
 				}
-
-
-
-
-
-
-
-
+			`,
+			css`
 				.right-container {
 					display: flex;
 					flex-direction: row;
+					gap: 0px;
+					width: 100%;
+					padding: 0px;
 				}
 
 				.all-agent-container {
 					display: flex;
 					flex-direction: column;
+					width: 70%;
+				}
+
+				.all-agent-title {
+					color: #9b92cd;
+					padding-top: 30px;
+					padding-left: 30px;
+					margin-bottom: 50px;
+					margin-top: 0px;
 				}
 
 				.all-agent-element {
-
+					display: flex;
+					flex-direction: row;
+					gap: 30px;
+					padding: 10px 0px 10px 30px;
+					cursor: pointer;
 				}
 
-				.selected-all-agent-element {
+				.all-agent-element-image-container {
+					width: 40px;
+					height: 40px;
+					background-color: #000000;
+				}
 
+				.all-agent-element-text {
+					align-self: center;
+					font-weight: bold;
+					font-size: 18px;
+				}
+
+				.all-agent-element-selected {
+					background-color: #f8f2ff;
 				}
 
 				.one-agent-container {
 					display: flex;
 					flex-direction: column;
 					gap: 20px;
+					width: 100%;
+					border-radius: 1rem;
+					background-color: #f8f2ff;
+					padding: 30px;
 				}
 
+				.one-agent-image-container {
+					width: 160px;
+					height: 160px;
+					background-color: #000000;
+					align-self: center;
+				}
 
+				.one-agent-title-container {
+					display: flex;
+					flex-direction: column;
+					gap: 5px;
+				}
 
+				.one-agent-title {
+					text-align: center;
+					font-weight: bold;
+					font-size: 22px;
+				}
 
+				.one-agent-wallet {
+					text-align: center;
+				}
 
+				.one-agent-role-container {
+					display: flex;
+					flex-direction: column;
+				}
 
+				.one-agent-role-title {
+					font-size: 22px;
+					font-weight: bold;
+				}
 
+				.one-agent-role-table {
+					text-align: left;
+					width: 100%;
+					border-spacing: 0;
+					border-collapse: collapse;
+
+					> thead > tr > th {
+						padding-top: 10px;
+						padding-bottom: 10px;
+					}
+
+					> tbody > tr > td {
+						padding-top: 10px;
+						padding-bottom: 10px;
+						border-top: 2px solid var(--primary-color);
+						border-bottom: 2px solid var(--primary-color);
+					}
+				}
+			`,
+			css`
 				kana-form {
 					width: 100%;
 				}
@@ -192,6 +263,25 @@ export class EditProjectPage extends AbstractCardsPage {
                 input, select {
                     font-family: sans;
                 }
+
+				input[type="checkbox"] {
+					zoom: 1.1;
+					transform: scale(1.1);
+					cursor: pointer;
+					outline: 1px solid var(--primary-color);
+					border-radius: 50%;
+					appearance: none;
+					background-color: #ffffff;
+				}
+
+				input[type="checkbox"]:checked {
+					zoom: 1.1;
+					transform: scale(1.1);
+					cursor: pointer;
+					border-radius: 50%;
+					appearance: none;
+					background-color: var(--primary-color);
+				}
 
                 input {
                     padding: 10px;
@@ -249,13 +339,39 @@ export class EditProjectPage extends AbstractCardsPage {
                     min-width: fit-content;
                     flex: 1;
                 }
+			`,
+			css`
+				.form-row lion-validation-feedback, .form-row-column lion-validation-feedback {
+                    position: absolute;
+                    background-color: var(--highlighted-light-color);
+                    color: var(--background-color);
+                    padding: 10px;
+                    border-radius: 10px;
+                    display: inline-block;
+                    max-width: 12rem;
+                    font-size: 0.8rem;
+                    line-height: 1.2;
+                    bottom: 2rem;
+                    margin-left: -3rem;
+                    width: max-content;
+                    z-index: 1
+                }
 
-
-
-
-
-
-
+                .form-row lion-validation-feedback:not([type="error"]), .form-row-column lion-validation-feedback:not([type="error"]) {
+                    display: none;
+                }
+                
+                .form-row lion-validation-feedback::before, .form-row-column lion-validation-feedback::before {
+                    content: '';
+                    position: absolute;
+                    bottom: -18px;
+                    left: 10%;
+                    margin-left: -10px;
+                    border: 10px solid transparent;
+                    border-top: 15px solid var(--highlighted-light-color);
+                }
+            `,
+			css`
 				.button-container {
 					display: flex;
 					flex-direction: row;
@@ -403,18 +519,96 @@ export class EditProjectPage extends AbstractCardsPage {
 
 					<div class="card right-container">
 						<div class="all-agent-container">
-							<div class="selected-all-agent-element">
-								
+							<h2 class="all-agent-title">Agents</h2>
+							<div class="all-agent-element all-agent-element-selected">
+								<div class="all-agent-element-image-container"></div>
+								<div class="all-agent-element-text">
+									SuperAdmin
+								</div>
 							</div>
 							<div class="all-agent-element">
-								
+								<div class="all-agent-element-image-container"></div>
+								<div class="all-agent-element-text">
+									Admin#1
+								</div>
 							</div>
 							<div class="all-agent-element">
-								
+								<div class="all-agent-element-image-container"></div>
+								<div class="all-agent-element-text">
+									Admin#2
+								</div>
 							</div>
 						</div>
 						<div class="one-agent-container">
-							
+							<div class="one-agent-image-container"></div>
+
+							<hr class="line"/>
+
+							<div class="one-agent-title-container">
+								<div class="one-agent-title">SuperAdmin</div>
+								<div class="one-agent-wallet">0x0328...03d</div>
+							</div>
+
+							<div class="one-agent-role-container">
+								<h2 class="one-agent-role-title">Roles</h2>
+
+								<table class="one-agent-role-table">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>User</th>
+											<th>Manager</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>SuperAdmin</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+										</tr>
+										<tr>
+											<td>Admin</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+										</tr>
+										<tr>
+											<td>Minter</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+										</tr>
+										<tr>
+											<td>Burner</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+										</tr>
+										<tr>
+											<td>Pauser</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+											<td>
+												<input type="checkbox"/>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 				</div>
