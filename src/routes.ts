@@ -4,6 +4,7 @@ import './pages/projects-page';
 import './pages/new-project-page';
 import './pages/contracts-page';
 import './pages/new-contract-page';
+import './pages/home-page';
 import { GlobalKanaloaEthers } from './api/kanaloa-ethers';
 import { Contract } from 'ethers';
 import { ContractsPage } from './pages/contracts-page';
