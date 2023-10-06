@@ -54,8 +54,9 @@ export class EditProjectPage extends AbstractCardsPage {
 					flex-direction: row;
 					gap: 40px;
 
-					@media only screen and (max-width: 1100px) {
+					@media only screen and (max-width: 1600px) {
 						flex-direction: column;
+						align-items: center;
 					}
 				}
 
@@ -70,183 +71,21 @@ export class EditProjectPage extends AbstractCardsPage {
 					box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                     box-sizing: border-box;
 					width: 100%;
+
+					@media only screen and (max-width: 1600px) {
+						width: 800px;
+						align-self: center;
+					}
+
+					@media only screen and (max-width: 1100px) {
+						width: 100%;
+					}
 				}
 
 				.line {
 					border: 1px solid var(--primary-color);
 					border-radius: 3px;
 					margin: 0;
-				}
-			`,
-			css`
-				.left-container {
-					display: flex;
-					flex-direction: column;
-					gap: 40px;
-					width: 70%;
-				}
-			`,
-			css`
-				.project-container {
-					display: flex;
-					flex-direction: column;
-					gap: 30px;
-					height: 100%;
-				}
-
-				.project-title {
-					font-size: 22px;
-				}
-
-				.project-info-container {
-					display: flex;
-					flex-direction: column;
-					gap: 10px;
-				}
-
-				.project-info-title {
-					font-weight: bold;
-				}
-
-				.role-container {
-					display: flex;
-					flex-direction: column;
-					gap: 100px;
-				}
-
-				.search-role-container {
-					display: flex;
-					flex-direction: row;
-					gap: 20px;
-				}
-
-				.existing-role-container {
-					display: flex;
-					flex-direction: row;
-					gap: 10px;
-				}
-
-				.existing-role-element {
-					padding: 10px;
-					font-size: 14px;
-                    box-shadow: 0 0 5px 1px #000000;
-					background-color: var(--primary-color);
-					border-radius: 20px;
-					border: none;
-					color: #ffffff;
-				}
-
-				.existing-role-element-selected {
-					background-color: var(--highlighted-color);
-				}
-			`,
-			css`
-				.right-container {
-					display: flex;
-					flex-direction: row;
-					gap: 0px;
-					width: 100%;
-					padding: 0px;
-				}
-
-				.all-agent-container {
-					display: flex;
-					flex-direction: column;
-					width: 70%;
-				}
-
-				.all-agent-title {
-					color: #9b92cd;
-					padding-top: 30px;
-					padding-left: 30px;
-					margin-bottom: 50px;
-					margin-top: 0px;
-				}
-
-				.all-agent-element {
-					display: flex;
-					flex-direction: row;
-					gap: 30px;
-					padding: 10px 0px 10px 30px;
-					cursor: pointer;
-				}
-
-				.all-agent-element-image-container {
-					width: 40px;
-					height: 40px;
-					background-color: #000000;
-				}
-
-				.all-agent-element-text {
-					align-self: center;
-					font-weight: bold;
-					font-size: 18px;
-				}
-
-				.all-agent-element-selected {
-					background-color: #f8f2ff;
-				}
-
-				.one-agent-container {
-					display: flex;
-					flex-direction: column;
-					gap: 20px;
-					width: 100%;
-					border-radius: 1rem;
-					background-color: #f8f2ff;
-					padding: 30px;
-				}
-
-				.one-agent-image-container {
-					width: 160px;
-					height: 160px;
-					background-color: #000000;
-					align-self: center;
-				}
-
-				.one-agent-title-container {
-					display: flex;
-					flex-direction: column;
-					gap: 5px;
-				}
-
-				.one-agent-title {
-					text-align: center;
-					font-weight: bold;
-					font-size: 22px;
-				}
-
-				.one-agent-wallet {
-					text-align: center;
-				}
-
-				.one-agent-role-container {
-					display: flex;
-					flex-direction: column;
-				}
-
-				.one-agent-role-title {
-					font-size: 22px;
-					font-weight: bold;
-				}
-
-				.one-agent-role-table {
-					text-align: left;
-					width: 100%;
-					border-spacing: 0;
-					border-collapse: collapse;
-
-					> thead > tr > th {
-						padding-top: 10px;
-						padding-bottom: 10px;
-					}
-
-					> tbody > tr > td {
-						padding-top: 10px;
-						padding-bottom: 10px;
-						border-top: 2px solid var(--primary-color);
-						border-bottom: 2px solid var(--primary-color);
-					}
 				}
 			`,
 			css`
@@ -313,6 +152,15 @@ export class EditProjectPage extends AbstractCardsPage {
 					display: flex;
 					flex-direction: row;
 					gap: 10px;
+
+					@media only screen and (max-width: 900px) {
+						flex-direction: column;
+						gap: 10px;
+
+						> div > kana-button-submit {
+							width: 100%;
+						}
+					}
 				}
 
                 select {
@@ -339,6 +187,202 @@ export class EditProjectPage extends AbstractCardsPage {
                     min-width: fit-content;
                     flex: 1;
                 }
+			`,
+			css`
+				.left-container {
+					display: flex;
+					flex-direction: column;
+					gap: 40px;
+					width: 70%;
+
+					@media only screen and (max-width: 1100px) {
+						width: 100%;
+					}
+				}
+			`,
+			css`
+				.project-container {
+					display: flex;
+					flex-direction: column;
+					gap: 30px;
+					height: 100%;
+				}
+
+				.project-title {
+					font-size: 22px;
+				}
+
+				.project-info-container {
+					display: flex;
+					flex-direction: column;
+					gap: 10px;
+				}
+
+				.project-info-title {
+					font-weight: bold;
+				}
+
+				.role-container {
+					display: flex;
+					flex-direction: column;
+					gap: 30px;
+					height: 100%;
+
+					@media only screen and (max-width: 900px) {
+						gap: 50px;
+					}
+				}
+
+				.search-role-container {
+					display: flex;
+					flex-direction: row;
+					gap: 20px;
+				}
+
+				.existing-role-container {
+					display: flex;
+					flex-direction: row;
+					gap: 10px;
+
+					@media only screen and (max-width: 900px) {
+						flex-direction: column;
+					}
+				}
+
+				.existing-role-element {
+					padding: 10px;
+					font-size: 14px;
+                    box-shadow: 0 0 5px 1px #000000;
+					background-color: var(--primary-color);
+					border-radius: 20px;
+					border: none;
+					color: #ffffff;
+				}
+
+				.existing-role-element-selected {
+					background-color: var(--highlighted-color);
+				}
+			`,
+			css`
+				.right-container {
+					display: flex;
+					flex-direction: row;
+					gap: 0px;
+					padding: 0px;
+
+					@media only screen and (max-width: 900px) {
+						flex-direction: column;
+						gap: 30px;
+					}
+				}
+
+				.all-agent-container {
+					display: flex;
+					flex-direction: column;
+					width: 70%;
+
+					@media only screen and (max-width: 900px) {
+						width: 100%;
+					}
+				}
+
+				.all-agent-title {
+					color: #9b92cd;
+					padding-top: 30px;
+					padding-left: 30px;
+					margin-bottom: 50px;
+					margin-top: 0px;
+				}
+
+				.all-agent-element {
+					display: flex;
+					flex-direction: row;
+					gap: 30px;
+					padding: 10px 0px 10px 30px;
+					cursor: pointer;
+				}
+
+				.all-agent-element-image-container {
+					width: 40px;
+					height: 40px;
+					background-color: #000000;
+				}
+
+				.all-agent-element-text {
+					align-self: center;
+					font-weight: bold;
+					font-size: 18px;
+				}
+
+				.all-agent-element-selected {
+					background-color: #f8f2ff;
+				}
+
+				.one-agent-container {
+					display: flex;
+					flex-direction: column;
+					gap: 20px;
+					width: 100%;
+					border-radius: 1rem;
+					background-color: #f8f2ff;
+					padding: 30px;
+
+					@media only screen and (max-width: 900px) {
+						width: auto;
+					}
+				}
+
+				.one-agent-image-container {
+					width: 160px;
+					height: 160px;
+					background-color: #000000;
+					align-self: center;
+				}
+
+				.one-agent-title-container {
+					display: flex;
+					flex-direction: column;
+					gap: 5px;
+				}
+
+				.one-agent-title {
+					text-align: center;
+					font-weight: bold;
+					font-size: 22px;
+				}
+
+				.one-agent-wallet {
+					text-align: center;
+				}
+
+				.one-agent-role-container {
+					display: flex;
+					flex-direction: column;
+				}
+
+				.one-agent-role-title {
+					font-size: 22px;
+					font-weight: bold;
+				}
+
+				.one-agent-role-table {
+					text-align: left;
+					width: 100%;
+					border-spacing: 0;
+					border-collapse: collapse;
+
+					> thead > tr > th {
+						padding-top: 10px;
+						padding-bottom: 10px;
+					}
+
+					> tbody > tr > td {
+						padding-top: 10px;
+						padding-bottom: 10px;
+						border-top: 2px solid var(--primary-color);
+						border-bottom: 2px solid var(--primary-color);
+					}
+				}
 			`,
 			css`
 				.form-row lion-validation-feedback, .form-row-column lion-validation-feedback {
@@ -378,7 +422,7 @@ export class EditProjectPage extends AbstractCardsPage {
 					gap: 20px;
 					justify-content: flex-end;
 
-					@media only screen and (max-width: 700px) {
+					@media only screen and (max-width: 900px) {
 						flex-direction: column;
 					}
 				}
@@ -386,7 +430,7 @@ export class EditProjectPage extends AbstractCardsPage {
 				.update-button {
 					width: 350px;
 
-					@media only screen and (max-width: 700px) {
+					@media only screen and (max-width: 900px) {
 						width: 100%;
 					}
 				}
@@ -394,7 +438,7 @@ export class EditProjectPage extends AbstractCardsPage {
 				.cancel-button {
 					width: 120px;
 
-					@media only screen and (max-width: 700px) {
+					@media only screen and (max-width: 900px) {
 						width: 100%;
 					}
 				}
@@ -485,26 +529,26 @@ export class EditProjectPage extends AbstractCardsPage {
 						</div>
 						<div class="card role-container">
 							<div class="search-role-container">
-							<kana-form @submit="${this.submitHandler}">
-							<form @submit=${(ev: Event) => ev.preventDefault()}>
-								<div class="form-row-column">
-									<kana-input
-										label-sr-only="Search Role"
-										placeholder="Search Role"
-										name="search-role"
-										.validators="${[
-											new MinMaxLength({ min: 4, max: 16}), // TODO: set correct borders
-											new Required()
-										]}"
-										.preprocessor=${maxLengthPreprocessor(16)}
-									></kana-input>
+								<kana-form @submit="${this.submitHandler}">
+									<form @submit=${(ev: Event) => ev.preventDefault()}>
+										<div class="form-row-column">
+											<kana-input
+												label-sr-only="Search Role"
+												placeholder="Search Role"
+												name="search-role"
+												.validators="${[
+													new MinMaxLength({ min: 4, max: 16}), // TODO: set correct borders
+													new Required()
+												]}"
+												.preprocessor=${maxLengthPreprocessor(16)}
+											></kana-input>
 
-									<div>
-										<kana-button-submit>Add New Role</kana-button-submit>
-									</div>
-								</div>
-							</form>
-						</kana-form>
+											<div>
+												<kana-button-submit>Add New Role</kana-button-submit>
+											</div>
+										</div>
+									</form>
+								</kana-form>
 							</div>
 							<div class="existing-role-container">
 								<div class="existing-role-element existing-role-element-selected">SuperAdmin</div>

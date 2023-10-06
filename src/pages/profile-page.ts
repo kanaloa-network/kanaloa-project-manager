@@ -241,12 +241,8 @@ export class ProfilePage extends AbstractCardsPage {
             `,
 			css`
 				.overview-card {
-					max-width: 300px;
+					width: 100%
 					min-height: 400px;
-
-					@media only screen and (max-width: 1100px) {
-						max-width: none;
-					}
 				}
 			`,
 			css`
@@ -274,7 +270,7 @@ export class ProfilePage extends AbstractCardsPage {
 					gap: 20px;
 					justify-content: flex-end;
 
-					@media only screen and (max-width: 700px) {
+					@media only screen and (max-width: 900px) {
 						flex-direction: column;
 					}
 				}
@@ -282,7 +278,7 @@ export class ProfilePage extends AbstractCardsPage {
 				.update-button {
 					width: 350px;
 
-					@media only screen and (max-width: 700px) {
+					@media only screen and (max-width: 900px) {
 						width: 100%;
 					}
 				}
@@ -290,7 +286,7 @@ export class ProfilePage extends AbstractCardsPage {
 				.cancel-button {
 					width: 120px;
 
-					@media only screen and (max-width: 700px) {
+					@media only screen and (max-width: 900px) {
 						width: 100%;
 					}
 				}
