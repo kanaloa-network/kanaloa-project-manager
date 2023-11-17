@@ -1,4 +1,5 @@
-import { fallthrough, reflect } from "./utils/attribute-helpers";
+import { fallthrough, reflect, bindInitialAttrs } from "./utils/attribute-helpers";
+import { eventHandler, handlerSetup } from "./utils/event-handler";
 
 const INPUT_TYPES = [
   "button",
@@ -124,7 +125,7 @@ export class PulpitoInput extends HTMLElement {
             option.selected = true;
           }
         }
-      /* falls through */
+        break;
       case "fieldset":
         // Just throw if it's not an object
         if (
@@ -136,10 +137,12 @@ export class PulpitoInput extends HTMLElement {
             "Attempting to set fieldset with non-object",
           );
         }
+
+        // TODO: set fieldset children!
         break;
+        // TODO: default behavior
     }
   }
-  // deno-lint-ignore getter-return
   get value(): FieldValue {
     // NOTE: it would be more robust to return these values as an object
     //       that could be cast to more specific types
@@ -190,19 +193,25 @@ export class PulpitoInput extends HTMLElement {
     this.elementInternals = this.attachInternals();
 
     this.attachShadow({ mode: "open" });
+    handlerSetup(this);
   }
 
+  @bindInitialAttrs
   connectedCallback() {
     this.shadowRoot!.innerHTML = "";
     this.shadowRoot!.append(this.inputElement!);
     this.dispatchEvent(new CustomEvent("input-connected", {
-      detail: this
+      detail: this,
+      bubbles: true,
+      composed: true
     }));
   }
 
   disconnectedCallback() {
     this.dispatchEvent(new CustomEvent("input-disconnected", {
-      detail: this
+      detail: this,
+      bubbles: true,
+      composed: true
     }));
   }
 
@@ -238,6 +247,34 @@ export class PulpitoInput extends HTMLElement {
     // meant to have side effects
     this.disabled = (this.disabled);
     this.readOnly = (this.readOnly);
+  }
+
+  public attributeChangedCallback(
+    name: string, oldValue: string, newValue: string
+  ) {
+    if (oldValue == newValue) {
+      return;
+    }
+
+    if (name === "type") {
+      const tag = InputType2InputTag(newValue);
+      this.inputElement = document.createElement(tag);
+      if (tag === "input") {
+        this.inputElement.setAttribute("type", newValue)
+      }
+    }
+  }
+
+  // The following event handlers prevent fieldsets from registering
+  // themselves into a top level form.
+  @eventHandler("input-disconnected", { capture: true })
+  public handleInputDisconnected(e: CustomEvent<any>) {
+    e.stopPropagation();
+  }
+
+  @eventHandler("input-connected", { capture: true })
+  public handleInputConnected(e: CustomEvent<any>) {
+    e.stopPropagation();
   }
 }
 

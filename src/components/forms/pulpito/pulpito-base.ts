@@ -1,0 +1,3 @@
+class PulpitoBase extends HTMLElement {
+    
+}
