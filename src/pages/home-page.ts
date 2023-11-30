@@ -17,7 +17,7 @@ export class HomePage extends LitElement {
         return html`
             <h1>${this.name}</h1>
             <pulpito-form>
-                <pulpito-input type="text" name="test"></pulpito-input>
+                <pulpito-input type="text" name="test" disabled></pulpito-input>
             </pulpito-form>
         `;
     }

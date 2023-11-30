@@ -1,5 +1,6 @@
 import { fallthrough, reflect, bindInitialAttrs } from "./utils/attribute-helpers";
 import { eventHandler, handlerSetup } from "./utils/event-handler";
+import { PulpitoBase } from "./pulpito-base";
 
 const INPUT_TYPES = [
   "button",
@@ -27,7 +28,7 @@ const INPUT_TYPES = [
 ];
 const INPUT_TAGS = [
   // NOTE: "button" exists, but is basically superseded by typed inputs
-  // Makes me wonder why even have different tags for these inputs
+  // Makes me wonder why even have different tags for these elements
   "input",
   "datalist",
   "fieldset",
@@ -62,31 +63,14 @@ export type FieldValue =
   | { [key: string]: FieldValue }
   | null;
 
-export class PulpitoInput extends HTMLElement {
-  // This API looks like a mess
-  static formAssociated = true;
-  declare elementInternals: ElementInternals;
+export class PulpitoInput extends PulpitoBase {
 
   static get observedAttributes() {
-    return ["type", "name", "disabled", "readOnly", "invalid"];
-  }
-
-  // I am pretty sure this should be hoisted, but ChatGPT begged to differ
-  public inputElement: HTMLElement | undefined;
-  private getFormElement(): HTMLElement {
-    return this.inputElement!;
+    return super.observedAttributes.push("type");
   }
 
   @reflect
   accessor type: InputType = "text";
-  @reflect
-  accessor name: string | undefined;
-  @reflect @fallthrough(PulpitoInput.prototype.getFormElement)
-  accessor disabled: boolean | undefined;
-  @reflect @fallthrough(PulpitoInput.prototype.getFormElement)
-  accessor readOnly: boolean | undefined;
-  @reflect @fallthrough(PulpitoInput.prototype.getFormElement)
-  accessor invalid: boolean | undefined;
 
   set value(val: FieldValue) {
     switch (this.type) {
@@ -188,33 +172,6 @@ export class PulpitoInput extends HTMLElement {
     }
   }
 
-  constructor() {
-    super();
-    this.elementInternals = this.attachInternals();
-
-    this.attachShadow({ mode: "open" });
-    handlerSetup(this);
-  }
-
-  @bindInitialAttrs
-  connectedCallback() {
-    this.shadowRoot!.innerHTML = "";
-    this.shadowRoot!.append(this.inputElement!);
-    this.dispatchEvent(new CustomEvent("input-connected", {
-      detail: this,
-      bubbles: true,
-      composed: true
-    }));
-  }
-
-  disconnectedCallback() {
-    this.dispatchEvent(new CustomEvent("input-disconnected", {
-      detail: this,
-      bubbles: true,
-      composed: true
-    }));
-  }
-
   render() {
     this.inputElement!.setAttribute("name", this.name || "");
     this.inputElement![
@@ -265,17 +222,6 @@ export class PulpitoInput extends HTMLElement {
     }
   }
 
-  // The following event handlers prevent fieldsets from registering
-  // themselves into a top level form.
-  @eventHandler("input-disconnected", { capture: true })
-  public handleInputDisconnected(e: CustomEvent<any>) {
-    e.stopPropagation();
-  }
-
-  @eventHandler("input-connected", { capture: true })
-  public handleInputConnected(e: CustomEvent<any>) {
-    e.stopPropagation();
-  }
 }
 
 function getSelectedOptions(selElem: HTMLSelectElement): HTMLOptionElement[] {
