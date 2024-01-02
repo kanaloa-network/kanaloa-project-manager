@@ -17,13 +17,13 @@ export function eventHandler(
     options?: AddEventListenerOptions,
 ): Decorator {
     return (target: any, _, descriptor: PropertyDescriptor) => {
-        if (target._eventHandlers == null) {
+        if (!target.hasOwnProperty("_eventHandlers")) {
             Object.defineProperty(
                 target,
                 "_eventHandlers",
                 {
                     enumerable: false,
-                    value: [],
+                    value: [ ...(target._eventHandlers || []) ]
                 },
             );
         }
@@ -33,5 +33,5 @@ export function eventHandler(
             options: options,
         });
     };
-  }
+}
   
