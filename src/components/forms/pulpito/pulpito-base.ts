@@ -1,24 +1,46 @@
-export class PulpitoBase extends HTMLElement {
+import { fallthrough, reflect, bindInitialAttrs } from "./utils/attribute-helpers";
+import { eventHandler, handlerSetup } from "./utils/event-handler";
 
+export type FieldValue =
+  | string
+  | string[]
+  | { [key: string]: FieldValue }
+  | null;
+
+export type PreprocessingRule<T extends FieldValue> = (value: T) => T;
+export type ValidationRule<T extends FieldValue> = 
+  (value: T) => Promise<string | Element | undefined>;
+
+export interface FieldSchema<T extends FieldValue> {
+    type: string;
+    preprocessing: Array<T>
+    validation: Array<ValidationRule<T>>;
+    defaultValue?: T;
+    children: Record<string, FieldSchema<FieldValue>>;
+}
+
+export abstract class PulpitoBase extends HTMLElement {
     public inputElement: HTMLElement | undefined;
-    private getInputlement(): HTMLElement {
+    private getInputElement(): HTMLElement {
       return this.inputElement!;
     }
 
     @reflect
     accessor name: string | undefined;
-    @reflect @fallthrough(PulpitoBase.prototype.getInputlement)
+    @reflect @fallthrough(PulpitoBase.prototype.getInputElement)
     accessor disabled: boolean | undefined;
-    @reflect @fallthrough(PulpitoBase.prototype.getInputlement)
+    @reflect @fallthrough(PulpitoBase.prototype.getInputElement)
     accessor readOnly: boolean | undefined;
-    @reflect @fallthrough(PulpitoBase.prototype.getInputlement)
+    @reflect @fallthrough(PulpitoBase.prototype.getInputElement)
     accessor invalid: boolean | undefined;
+    
+    abstract accessor value: FieldValue;
 
     // This API looks like a mess
     static formAssociated = true;
     declare elementInternals: ElementInternals;
 
-    static get observedAttributes() {
+    static get observedAttributes(): Array<string> {
         return ["name", "disabled", "readOnly", "invalid"];
     }
 
@@ -27,6 +49,7 @@ export class PulpitoBase extends HTMLElement {
         this.elementInternals = this.attachInternals();
     
         this.attachShadow({ mode: "open" });
+        
         handlerSetup(this);
     }
 

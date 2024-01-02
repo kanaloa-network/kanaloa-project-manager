@@ -1,6 +1,6 @@
 import { fallthrough, reflect, bindInitialAttrs } from "./utils/attribute-helpers";
 import { eventHandler, handlerSetup } from "./utils/event-handler";
-import { PulpitoBase } from "./pulpito-base";
+import { PulpitoBase, FieldValue } from "./pulpito-base";
 
 const INPUT_TYPES = [
   "button",
@@ -57,16 +57,10 @@ const CHILDFUL_INPUT_TAGS: InputTag[] = [
   "fieldset",
 ];
 
-export type FieldValue =
-  | string
-  | string[]
-  | { [key: string]: FieldValue }
-  | null;
-
 export class PulpitoInput extends PulpitoBase {
 
-  static get observedAttributes() {
-    return super.observedAttributes.push("type");
+  static get observedAttributes(): Array<string> {
+    return [...super.observedAttributes, "type"];
   }
 
   @reflect
