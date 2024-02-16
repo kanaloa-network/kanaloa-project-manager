@@ -42,19 +42,27 @@ export class ProjectsPage extends AbstractCardsPage {
 
             // NOTE/TODO: The most innefficient way to do this
             // Move to a subgraph and a Promise.all in production
-            if (await proj.balanceOf(GlobalKanaloaEthers.address) != 0) {
-                const address: string = project.address;
-                const name: string = project.project;
-                response.push(new KanaCard({
-                    name: name,
-                    button: {
-                        text: "Contracts",
-                        link: `/projects/${address}`
-                    },
-                    address: address,
-                    description: project.description
-                }))
-            }
+            try {
+                if (
+                    (
+                        await proj.balanceOf(
+                            await GlobalKanaloaEthers.requestSigner()
+                        )
+                    ) != 0
+                ) {
+                    const address: string = project.address;
+                    const name: string = project.project;
+                    response.push(new KanaCard({
+                        name: name,
+                        button: {
+                            text: "Contracts",
+                            link: `/projects/${address}`
+                        },
+                        address: address,
+                        description: project.description
+                    }))
+                }
+            } catch (err) {}
         }
 
         this.isLoading = false;
