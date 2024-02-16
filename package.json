@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "webpack --env mode=release --config webpack.config.js",
     "serve": "webpack serve --env mode=demo --config webpack.config.js",
     "watch": "tsc --watch"
   },
@@ -30,6 +30,7 @@
     "typescript": "^5.0.4"
   },
   "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.8.1",
     "custom-elements-manifest": "^2.0.0",
     "html-webpack-plugin": "^5.5.1",

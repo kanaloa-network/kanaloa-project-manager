@@ -1,6 +1,8 @@
 // webpack.config.js
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from "path";
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 
 export default function (env) { 
   const mode = 
@@ -43,12 +45,17 @@ export default function (env) {
           ),
       },
     },
+    optimization: {
+      splitChunks: false, // Disables the SplitChunksPlugin
+      runtimeChunk: false, // Prevents an extra chunk for the webpack runtime
+    },
     output: {
       filename: 'bundle.js',
       path: path.resolve('dist'),
       publicPath: "/"
     },
     plugins: [
+      new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
         template: 'index.html',
       }),
