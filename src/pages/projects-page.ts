@@ -10,7 +10,6 @@ import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
 import { Contract } from 'ethers';
 import { AbstractCardsPage } from './abstract-cards-page';
 
-
 @customElement('projects-page')
 export class ProjectsPage extends AbstractCardsPage {
     async fetchData() {
@@ -32,7 +31,7 @@ export class ProjectsPage extends AbstractCardsPage {
             // 2 - the visibility of the project, which is irrelevant here
             // 3 - the description of the project
             const proj = new Contract(
-                project[0],
+                project.address,
                 [
                     "function balanceOf(address owner) view returns (uint256 balance)",
                     "function name() view returns (string)",
@@ -44,8 +43,8 @@ export class ProjectsPage extends AbstractCardsPage {
             // NOTE/TODO: The most innefficient way to do this
             // Move to a subgraph and a Promise.all in production
             if (await proj.balanceOf(GlobalKanaloaEthers.address) != 0) {
-                const address: string = project[0];
-                const name: string = await proj.name();
+                const address: string = project.address;
+                const name: string = project.project;
                 response.push(new KanaCard({
                     name: name,
                     button: {
@@ -53,7 +52,7 @@ export class ProjectsPage extends AbstractCardsPage {
                         link: `/projects/${address}`
                     },
                     address: address,
-                    description: project[3]
+                    description: project.description
                 }))
             }
         }

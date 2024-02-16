@@ -58,6 +58,11 @@ const CHILDFUL_INPUT_TAGS: InputTag[] = [
 ];
 
 export class PulpitoInput extends PulpitoBase {
+  public inputElement: HTMLElement | undefined;
+  protected override getInnerElement(): HTMLElement {
+    return this.inputElement!;
+  }
+  
 
   static get observedAttributes(): Array<string> {
     return [...super.observedAttributes, "type"];

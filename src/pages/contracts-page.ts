@@ -29,7 +29,8 @@ export class ContractsPage extends AbstractCardsPage {
                 "function balanceOf(address owner) view returns (uint256 balance)",
                 "function name() view returns (string)",
                 "function symbol() view returns (string)",                
-                "function contractsRepositoryLength() view returns (uint256)"
+                "function contractsRepositoryLength() view returns (uint256)",
+                "function getContracts(uint256 from, uint256 to) view returns (address[])"
             ],
             GlobalKanaloaEthers.wallet
         );
@@ -56,7 +57,7 @@ export class ContractsPage extends AbstractCardsPage {
                 response.push(new KanaCard({
                     name: name,
                     button: {
-                        text: "Contracts",
+                        text: "Edit (coming soon)",
                         link: `/contracts/${address}`
                     },
                     address: address as string,

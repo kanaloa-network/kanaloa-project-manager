@@ -16,12 +16,15 @@ import { getBasicModules, getAllModules } from '../components/modules/modules-li
 import { headerStyles } from '../components/common-styles';
 import { eventHandler, handlerSetup } from '../utils/event-handler';
 import { when } from 'lit/directives/when.js';
+import { ERC20Form } from 'src/components/modules/erc20-form';
+import KanaloaAddressBook from "kanaloa-address-book.json";
+import { Contract, ethers } from 'ethers';
 
 @customElement('new-contract-page')
 export class NewContractPage extends LitElement {
 
     @property({ type: String })
-    declare name: String;
+    declare name: string;
     @property({ type: String })
     declare address: string;
     @property({ type: Boolean })
@@ -85,23 +88,94 @@ export class NewContractPage extends LitElement {
     }
 
     async submitHandler(ev: Event) {
-        let form: KanaForm = ev.target as KanaForm;
-        console.log(form)
-        if (form.hasFeedbackFor.includes('error')) {
-          const firstFormElWithError = form.formElements.find(
-                (el: any) => el.hasFeedbackFor.includes('error'),
-          );
-          firstFormElWithError.focus();
-          return;
+        function querySelectorAllIncludingShadow(root: Element | ShadowRoot, selector: string) {
+            const elements = Array.from(root.querySelectorAll(selector));
+            
+            // Find all shadow roots under the current root
+            const shadowRoots = Array.from(root.querySelectorAll('*'))
+              .map(element => element.shadowRoot)
+              .filter(shadowRoot => !!shadowRoot);
+          
+            // Recurse into each shadow root and collect matches
+            shadowRoots.map((shadowRoot) => {
+              elements.push(
+                ...querySelectorAllIncludingShadow(shadowRoot!, selector)
+                );
+            });
+          
+            return elements;
         }
-        const formData = form.modelValue;
+          
+          
+        // let form: KanaForm = ev.target as KanaForm;
+        const forms: KanaForm[] = 
+            querySelectorAllIncludingShadow(this.shadowRoot!, 'kana-form') as KanaForm[];
+        for (const form of Array.from(forms)) {
+            form.validate();
+            if ((form as KanaForm).hasFeedbackFor.includes('error')) {
+                const firstFormElWithError = (form as KanaForm).formElements.find(
+                        (el: any) => el.hasFeedbackFor.includes('error'),
+                );
+                firstFormElWithError.focus();
+                return;
+            }
+        }
 
-        GlobalKanaloaEthers.projectRegistry.newProject({
-            projectName: formData.name,
-            abbreviation: formData.abbreviation,
-            description: formData.description,
-            visibility: 0
+        let model: any = {};
+        for (const form of Array.from(forms)) {
+            model = {...model, ...form.modelValue};
+        }
+
+        console.log(KanaloaAddressBook.KANA)
+        console.log(GlobalKanaloaEthers.signer?.getAddress())
+
+        const kanaToken: Contract = new Contract(
+            KanaloaAddressBook.KANA, [ 
+                "function allowance(address owner, address spender) view returns (uint256)",
+                "function approve(address spender, uint256 amount) returns (bool)"
+            ], GlobalKanaloaEthers.signer
+        );
+
+        const hasAllowance: bigint = 
+            await kanaToken.allowance(
+                GlobalKanaloaEthers.signer, 
+                KanaloaAddressBook.PaymentsProcessor
+            );
+
+        if (hasAllowance < BigInt(ethers.parseUnits("320000"))) {
+            await (
+                await kanaToken.approve(
+                    KanaloaAddressBook.PaymentsProcessor, 
+                    ethers.parseUnits("320000")
+                )
+            ).wait();
+        }
+
+        GlobalKanaloaEthers.projectRegistry.newContract({
+              name: model.name,
+              project: this.name,
+              genesisModules: [
+                {
+                    moduleSignature: "0xa7ea6982eb398487d571bb8d7880d038a52a2e20501e5d89251b0d77e2179769",
+                    initParams: ethers.AbiCoder.defaultAbiCoder().encode(
+                        [ "string", "string", "uint8", "uint256", "address" ],
+                        [ 
+                            model.name, model.symbol, 
+                            model.decimals, 
+                            BigInt(model["max-supply"]) * 10n ** BigInt(model.decimals),
+                            await GlobalKanaloaEthers.signer?.getAddress()
+                        ]
+                    )
+                }
+              ],
+              payment: KanaloaAddressBook.KANA
         });
+        
+
+        //const formData = form.modelValue;
+        //const erc20FormData = 
+            //(this.selectedForm.querySelector("erc20-form")! as ERC20Form).value();
+
         // fetch('/api/foo/', {
         //   method: 'POST',
         //   body: JSON.stringify(formData),
@@ -110,7 +184,7 @@ export class NewContractPage extends LitElement {
 
     @eventHandler("submit-form", { capture: true })
     captureSubmit() {
-        this.shadowRoot!.querySelector("kana-form")?.dispatchEvent(new Event("submit"))
+        this.shadowRoot!.querySelector("kana-form")!.dispatchEvent(new Event("submit"))
     }
     
 
@@ -256,6 +330,7 @@ export class NewContractBaseWindowlet extends KanaloaWindowlet {
 
     render() {
         return html`
+            <kana-form><form>
             <h2 id="contract-title">
                 ${
                     (this.name == null || this.name == "") ? 
@@ -285,7 +360,7 @@ export class NewContractBaseWindowlet extends KanaloaWindowlet {
                     @change=${this.selectContractType}
                 >
                     <select name="type-select" slot="input">
-                        <option hidden selected>
+                        <option hidden selected value>
                             Select type
                         </option>
                         ${repeat(
@@ -306,10 +381,16 @@ export class NewContractBaseWindowlet extends KanaloaWindowlet {
                 </kana-select>
             </div>
             <div class="form-row">
-                <kana-button-submit>
-                    Deploy new project
+                <kana-button-submit @click=${
+                    () => this.dispatchEvent(
+                        new CustomEvent('submit-form', 
+                        { bubbles: true, composed: true }
+                    )
+                )}>
+                    Deploy new contract (320000 $KANA)
                 </kana-button-submit>
             </div>
+            </form></kana-form>
         `;
     }
 }
@@ -423,6 +504,7 @@ export class ModulesWindowlet extends KanaloaWindowlet {
                     />
                     ${baseModuleParams.name}
                 </li>
+                <li style="margin-top: 15px; color: grey;">Hmm... there seem to be no available plugins for this contract type yet.</li>
                 ${
                     repeat(
                         otherModules, 

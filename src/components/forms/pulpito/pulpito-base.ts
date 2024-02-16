@@ -19,19 +19,20 @@ export interface FieldSchema<T extends FieldValue> {
     children: Record<string, FieldSchema<FieldValue>>;
 }
 
+function getThisInnerElement(this: PulpitoBase): HTMLElement {
+  return this.getInnerElement();
+}
+
 export abstract class PulpitoBase extends HTMLElement {
-    public inputElement: HTMLElement | undefined;
-    private getInputElement(): HTMLElement {
-      return this.inputElement!;
-    }
+    protected abstract getInnerElement(): HTMLElement;
 
     @reflect
     accessor name: string | undefined;
-    @reflect @fallthrough(PulpitoBase.prototype.getInputElement)
+    @reflect @fallthrough(getThisInnerElement)
     accessor disabled: boolean | undefined;
-    @reflect @fallthrough(PulpitoBase.prototype.getInputElement)
+    @reflect @fallthrough(getThisInnerElement)
     accessor readOnly: boolean | undefined;
-    @reflect @fallthrough(PulpitoBase.prototype.getInputElement)
+    @reflect @fallthrough(getThisInnerElement)
     accessor invalid: boolean | undefined;
     
     abstract accessor value: FieldValue;
@@ -56,7 +57,7 @@ export abstract class PulpitoBase extends HTMLElement {
     @bindInitialAttrs
     connectedCallback() {
       this.shadowRoot!.innerHTML = "";
-      this.shadowRoot!.append(this.inputElement!);
+      this.shadowRoot!.append(this.getInnerElement());
       this.dispatchEvent(new CustomEvent("input-connected", {
         detail: this,
         bubbles: true,

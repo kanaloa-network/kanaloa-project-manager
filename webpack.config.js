@@ -2,40 +2,56 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from "path";
 
-export default {
-  mode: 'development',
-  entry: './src/app.ts',
-  devtool: 'inline-source-map',
-  devServer: {
-    port: 8000,
-    static: "./",
-    open: false,
-    historyApiFallback: true
-  },
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
+export default function (env) { 
+  const mode = 
+    (env.mode === 'demo') ? 'demo' : 'release';
+
+  return {
+    mode: 'development',
+    entry: './src/app.ts',
+    devtool: 'inline-source-map',
+    devServer: {
+      port: 8000,
+      static: "./",
+      open: false,
+      historyApiFallback: true
+    },
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
+        {
+          test: /\.css$/i,
+          use: ["css-loader"],
+        },
+        {
+          test: /\.json$/,
+          type: 'json',
+        },
+      ],
+    },
+    resolve: {
+      extensions: ['.ts', '.js', ".json"],
+      alias: {
+        "kanaloa-address-book.json": 
+          path.resolve(
+            new URL('.', import.meta.url).pathname, 
+            `src/data/kanaloa-address-book.${mode}.json`
+          ),
       },
-      {
-        test: /\.css$/i,
-        use: ["css-loader"],
-      },
+    },
+    output: {
+      filename: 'bundle.js',
+      path: path.resolve('dist'),
+      publicPath: "/"
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: 'index.html',
+      }),
     ],
-  },
-  resolve: {
-    extensions: ['.ts', '.js'],
-  },
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve('dist'),
-    publicPath: "/"
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'index.html',
-    }),
-  ],
-};
+  };
+}

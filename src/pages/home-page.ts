@@ -16,9 +16,6 @@ export class HomePage extends LitElement {
     render() {
         return html`
             <h1>${this.name}</h1>
-            <pulpito-form>
-                <pulpito-input type="text" name="test" disabled></pulpito-input>
-            </pulpito-form>
         `;
     }
 }

@@ -6,6 +6,8 @@ import { MinMaxLength, Required } from "@lion/form-core"
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
 import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
 import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
+import KanaloaAddressBook from "kanaloa-address-book.json";
+import { Contract, ethers } from 'ethers';
 
 @customElement('new-project-page')
 export class NewProjectPage extends LitElement {
@@ -171,16 +173,35 @@ export class NewProjectPage extends LitElement {
         }
         const formData = ev.target.modelValue;
 
-        GlobalKanaloaEthers.projectRegistry.newProject({
+        const kanaToken: Contract = new Contract(
+            KanaloaAddressBook.KANA, [ 
+                "function allowance(address owner, address spender) view returns (uint256)",
+                "function approve(address spender, uint256 amount) returns (bool)"
+            ], GlobalKanaloaEthers.signer
+        );
+
+        const hasAllowance: bigint = 
+            await kanaToken.allowance(
+                GlobalKanaloaEthers.signer, 
+                KanaloaAddressBook.PaymentsProcessor
+            );
+
+        if (hasAllowance < BigInt(ethers.parseUnits("20000"))) {
+            await (
+                await kanaToken.approve(
+                    KanaloaAddressBook.PaymentsProcessor, 
+                    ethers.parseUnits("20000")
+                )
+            ).wait();
+        }
+
+        await GlobalKanaloaEthers.projectRegistry.newProject({
             projectName: formData.name,
             abbreviation: formData.abbreviation,
-            description: formData.description,
-            visibility: 0
-        });
-        // fetch('/api/foo/', {
-        //   method: 'POST',
-        //   body: JSON.stringify(formData),
-        // });
+            description: formData.description
+        })
+
+
       };
 
     render() {
@@ -228,36 +249,8 @@ export class NewProjectPage extends LitElement {
                             ></kana-input>
                         </div>
                         <div class="form-row">
-                            <kana-select
-                                label-sr-only="Visibility"
-                                name="visibility"
-                                placeholder="Visibility"
-                                .validators=${[ new Required() ]}
-                            >
-                                <select name="visibility-select" slot="input">
-                                    <option 
-                                        hidden
-                                        selected
-                                        value=""
-                                    >
-                                        Visibility
-                                    </option>
-                                    <option 
-                                        name="public" 
-                                        value="public">
-                                        Public
-                                    </option>
-                                    <option 
-                                        name="unlisted" 
-                                        value="unlisted">
-                                        Unlisted
-                                    </option>
-                                </select>
-                            </kana-select>
-                        </div>
-                        <div class="form-row">
                             <kana-button-submit>
-                                Deploy new project
+                                Deploy new project (20000 $KANA)
                             </kana-button-submit>
                         </div>
                     </form>

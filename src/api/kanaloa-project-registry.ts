@@ -1,24 +1,51 @@
 import { 
-    AbstractProvider, Addressable, Contract, Signer 
+    AbstractProvider, Addressable, Contract, Signer, ethers 
 } from "ethers";
 import { KanaloaEthers, requireConnection } from "./kanaloa-ethers";
+import KanaloaAddressBook from "kanaloa-address-book.json";
 
 const projectDataStruct: string = 
-    "address project, address deployer, int visibility, string description";
-export const PROJECT_REGISTRY_ADDRESS: string = "0x4ed7c70f96b99c776995fb64377f0d4ab3b0e1c1";
+    "address project, address deployer, string description";
+export const PROJECT_REGISTRY_ADDRESS: string = 
+    KanaloaAddressBook["KanaloaProjectRegistry"];
+export const KANA_ADDRESS: string = KanaloaAddressBook["KANA"];
 export const PROJECT_REGISTRY_ABI = [
     "function newProject("
         + "string projectName, string abbreviation, "
-        + "string description, int visibility) returns (address)",
+        + "string description, address payment"
+    + ") returns (address)",
     `event ProjectDeployed(${projectDataStruct})`,
-    `function getALLTheProjects() view returns (tuple(${projectDataStruct})[])`
+    `function getProject(string name) view returns (tuple(${projectDataStruct}))`,
+    `function newContract(`
+        + `string name, string project, `
+        + `tuple(bytes32, bytes)[] genesisModules, address payment`
+    + `) returns (address)`
 ]
+
 
 export interface ProjectConfigProps {
     projectName: string;
     abbreviation: string;
     description: string;
-    visibility: number;
+}
+
+export interface ProjectData {
+    address: string,
+    project: string;
+    deployer: string;
+    description: string;
+}
+
+export interface ModuleParameters {
+    moduleSignature: string,
+    initParams: string
+}
+
+export interface NewContractConfigProps {
+    name: string,
+    project: string,
+    genesisModules: ModuleParameters[],
+    payment: string
 }
 
 function getRegistryContract(provider: Signer | AbstractProvider): Contract {
@@ -34,19 +61,45 @@ export async function newProject(
 ): Promise<string | Addressable>  {
     const projectRegistry = getRegistryContract(signer);
     
-    return await projectRegistry.newProject(
-        params.projectName,
-        params.abbreviation,
-        params.description,
-        params.visibility
-    );
+    const tx = await (
+        await projectRegistry.newProject(
+            params.projectName,
+            params.abbreviation,
+            params.description,
+            KANA_ADDRESS
+        )
+    ).wait();
+
+    return (await projectRegistry.getProject(params.projectName)).project;
 }
 
-export async function getALLTheProjects(
+export async function newContract(
+    params: NewContractConfigProps,
+    signer: Signer
+): Promise<string | Addressable> {
+    const projectRegistry = getRegistryContract(signer);
+
+    const tx = await (
+        await projectRegistry.newContract(
+            params.name,
+            params.project,
+            params.genesisModules.map(
+                (m) => [ m.moduleSignature, m.initParams ]
+            ),
+            KanaloaAddressBook.KANA
+        )
+    ).wait();
+
+    return tx;
+}
+
+export async function getProjects(
     provider: AbstractProvider
 ): Promise<any[]> {
-    const projectRegistry = getRegistryContract(provider);
-    return await projectRegistry.getALLTheProjects();
+    const importedProjects: ProjectData[] = 
+        JSON.parse(localStorage.getItem("kanaloa.imported_projects") || "[]");
+
+    return importedProjects;
 }
 
 export class ProjectRegistry {
@@ -55,13 +108,37 @@ export class ProjectRegistry {
         this.parent = parent;
     }
 
-    async getProjects() {
-        return await getALLTheProjects(this.parent.wallet)
+    async getProjects(): Promise<ProjectData[]> {
+        return await getProjects(this.parent.wallet);
     }
 
     // Rework requireconnection
     //@requireConnection
     async newProject(projectParams: ProjectConfigProps) {
-        return await newProject(projectParams, this.parent.signer!)
+        const project: string | Addressable = await newProject(
+            projectParams, this.parent.signer!
+        );
+
+        localStorage.setItem(
+            "kanaloa.imported_projects", 
+            JSON.stringify(
+                [ 
+                    ...(await getProjects(this.parent.wallet)),
+                    {
+                        address: project,
+                        project: projectParams.projectName,
+                        deployer: await this.parent.signer!.getAddress(),
+                        description: projectParams.description
+                    } as ProjectData
+                ]
+            )
+        );
+
+        return project;
+    }
+
+    async newContract(contractParams: NewContractConfigProps) {
+        await newContract(contractParams, this.parent.signer!);
+
     }
 }

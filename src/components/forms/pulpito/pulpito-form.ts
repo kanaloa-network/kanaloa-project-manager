@@ -1,20 +1,27 @@
 import { eventHandler, handlerSetup } from "./utils/event-handler";
 import { PulpitoBase } from "./pulpito-base";
 
-export class PulpitoForm extends PulpitoBase {
+export class PulpitoForm extends PulpitoBase {  
   public readonly form: HTMLFormElement;
   public fields: Set<HTMLElement>;
 
+  public value = "";
+
+  protected getInnerElement(): HTMLElement {
+    return this.form;
+  }
+
   constructor() {
     super();
-    const self = this.attachShadow({ mode: "open" });
+    
     this.form = document.createElement("form");
     this.fields = new Set<HTMLElement>();
 
     // Append the  contents of the previous lightDOM
-    self.append(this.form);
     Array.from(this.children).forEach((e) => this.form.append(e));
-    handlerSetup(this);
+    this.append(this.form);
+    
+    //handlerSetup(this);
   }
 
   // When an input connects, add it to the data object

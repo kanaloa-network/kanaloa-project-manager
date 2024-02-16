@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "serve": "webpack serve --config webpack.config.js",
+    "serve": "webpack serve --env mode=demo --config webpack.config.js",
     "watch": "tsc --watch"
   },
   "keywords": [],
