@@ -9,7 +9,7 @@ export default function (env) {
     (env.mode === 'demo') ? 'demo' : 'release';
 
   return {
-    mode: 'development',
+    mode: (mode === "demo") ? "development" : "production",
     entry: './src/app.ts',
     devtool: 'inline-source-map',
     devServer: {

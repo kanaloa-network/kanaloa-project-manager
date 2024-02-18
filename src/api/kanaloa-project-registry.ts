@@ -60,17 +60,19 @@ export async function newProject(
     params: ProjectConfigProps, signer: Signer
 ): Promise<string | Addressable>  {
     const projectRegistry = getRegistryContract(signer);
-    
-    const tx = await (
+    const addr = await (
         await projectRegistry.newProject(
             params.projectName,
             params.abbreviation,
             params.description,
             KANA_ADDRESS
         )
-    ).wait();
+    ).wait().then(
+        async () =>
+            (await projectRegistry.getProject(params.projectName)).project
+    );
 
-    return (await projectRegistry.getProject(params.projectName)).project;
+    return addr;
 }
 
 export async function newContract(
