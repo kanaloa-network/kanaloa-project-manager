@@ -6,7 +6,7 @@ import '../components/card';
 import '../components/loader';
 import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
-import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
+import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { Contract } from 'ethers';
 import { AbstractCardsPage } from './abstract-cards-page';
 
@@ -15,9 +15,9 @@ export class ProjectsPage extends AbstractCardsPage {
     async fetchData() {
         this.isLoading = true;
         const projects = 
-            await GlobalKanaloaEthers.projectRegistry.getProjects();
+            await KanaloaAPI.projectRegistry.getProjects();
         
-        if (GlobalKanaloaEthers.readOnly) {
+        if (KanaloaAPI.readOnly) {
             this.isLoading = false;
             this.items = [];
         }
@@ -37,7 +37,7 @@ export class ProjectsPage extends AbstractCardsPage {
                     "function name() view returns (string)",
                     "function symbol() view returns (string)"
                 ],
-                GlobalKanaloaEthers.wallet
+                KanaloaAPI.wallet
             );
 
             // NOTE/TODO: The most innefficient way to do this
@@ -46,7 +46,7 @@ export class ProjectsPage extends AbstractCardsPage {
                 if (
                     (
                         await proj.balanceOf(
-                            await GlobalKanaloaEthers.requestSigner()
+                            await KanaloaAPI.requestSigner()
                         )
                     ) != 0
                 ) {
@@ -76,7 +76,7 @@ export class ProjectsPage extends AbstractCardsPage {
                 ${
                     when(
                         this.isLoading,
-                        () => html`<kana-loading-screen></kana-loading-screen>`,
+                        () => html`<loading-icon></loading-icon>`,
                         () => repeat(
                                 this.items, 
                                 (k) => k.name, 

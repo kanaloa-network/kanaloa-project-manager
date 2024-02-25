@@ -118,7 +118,7 @@ export class ProjectRegistry {
     //@requireConnection
     async newProject(projectParams: ProjectConfigProps) {
         const project: string | Addressable = await newProject(
-            projectParams, this.parent.signer!
+            projectParams, (await this.parent.signer)!
         );
 
         localStorage.setItem(
@@ -129,7 +129,7 @@ export class ProjectRegistry {
                     {
                         address: project,
                         project: projectParams.projectName,
-                        deployer: await this.parent.signer!.getAddress(),
+                        deployer: await (await this.parent.signer!)?.getAddress(),
                         description: projectParams.description
                     } as ProjectData
                 ]
@@ -140,7 +140,7 @@ export class ProjectRegistry {
     }
 
     async newContract(contractParams: NewContractConfigProps) {
-        await newContract(contractParams, this.parent.signer!);
+        await newContract(contractParams, (await this.parent.signer)!);
 
     }
 }

@@ -1,13 +1,15 @@
 import { LitElement, html, css } from 'lit';
+import { Task } from '@lit/task';
 import { customElement } from 'lit/decorators.js';
 import "../components/forms/forms"
 import "../components/windowlet"
 import { MinMaxLength, Required } from "@lion/form-core"
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
 import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
-import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
-import KanaloaAddressBook from "kanaloa-address-book.json";
-import { Contract, ethers } from 'ethers';
+import { KanaloaAPI } from '../api/kanaloa-ethers';
+import { TaxableOperations } from '../api/payments-processor';
+import { LoadingIcon } from '../components/loader';
+
 
 @customElement('new-project-page')
 export class NewProjectPage extends LitElement {
@@ -112,7 +114,10 @@ export class NewProjectPage extends LitElement {
                     box-shadow: 0 0 0 2px var(--highlighted-light-color);
                 }
                 
-                
+                span {
+                    margin-left: 10px;
+                }
+                       
                 kana-button-submit {
                     min-width: fit-content;
                     flex: 1;
@@ -172,30 +177,22 @@ export class NewProjectPage extends LitElement {
           return;
         }
         const formData = ev.target.modelValue;
-
-        const kanaToken: Contract = new Contract(
-            KanaloaAddressBook.KANA, [ 
-                "function allowance(address owner, address spender) view returns (uint256)",
-                "function approve(address spender, uint256 amount) returns (bool)"
-            ], GlobalKanaloaEthers.signer
-        );
-
-        const hasAllowance: bigint = 
-            await kanaToken.allowance(
-                GlobalKanaloaEthers.signer, 
-                KanaloaAddressBook.PaymentsProcessor
+        
+        const projectCost = 
+            await KanaloaAPI.paymentsProcessor.calculateInvoice(
+                TaxableOperations.NEW_PROJECT,
+                { 
+                    client: await (await (await KanaloaAPI.signer)!).getAddress(),
+                    token: KanaloaAPI.KANA_TOKEN
+                }
             );
 
-        if (hasAllowance < BigInt(ethers.parseUnits("20000"))) {
-            await (
-                await kanaToken.approve(
-                    KanaloaAddressBook.PaymentsProcessor, 
-                    ethers.parseUnits("20000")
-                )
-            ).wait();
+        if (await KanaloaAPI.paymentsProcessor.requestAllowance(projectCost!) == false) {
+            return;
         }
 
-        await GlobalKanaloaEthers.projectRegistry.newProject({
+
+        await KanaloaAPI.projectRegistry.newProject({
             projectName: formData.name,
             abbreviation: formData.abbreviation,
             description: formData.description
@@ -204,7 +201,30 @@ export class NewProjectPage extends LitElement {
 
       };
 
+    private calculatedCost = new Task(this, {
+        task: async ([token]) => {
+            const client = await (await KanaloaAPI.signer)!.getAddress();
+            const projectCost = 
+                await KanaloaAPI.paymentsProcessor.calculateInvoice(
+                    TaxableOperations.NEW_PROJECT,
+                    { 
+                        client: client,
+                        token: token
+                    }
+                );
+                return projectCost!;
+            },
+            args: () => [KanaloaAPI.KANA_TOKEN]
+        }
+    );
+
     render() {
+        const cost = this.calculatedCost.render({
+            pending: () => html`<span><loading-icon size="1em"><loading-icon></span>`,
+            complete: (value) => html`<span>(${value / 10n ** 18n} $KANA)</span>`,
+            error: (error) => html`<p>(${error} ????)</p>`,
+        });
+
         return html`
             <h1>New Project</h1>
             <kana-windowlet>
@@ -250,7 +270,7 @@ export class NewProjectPage extends LitElement {
                         </div>
                         <div class="form-row">
                             <kana-button-submit>
-                                Deploy new project (20000 $KANA)
+                                Deploy new project ${cost}
                             </kana-button-submit>
                         </div>
                     </form>

@@ -1,9 +1,17 @@
-import { LitElement, html, css } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import "./icon";
+import { LitElement, html, css, CSSResult } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import "./icon.ts";
 
-@customElement("kana-loading-screen")
-export class KanaLoadingScreen extends LitElement {
+@customElement("loading-icon")
+export class LoadingIcon extends LitElement {
+  @property({ type: String })
+  declare size: string;
+
+  constructor() {
+    super();
+    this.size = "8rem";
+  }
+
   static get styles() {
     return css`
       :host {
@@ -17,7 +25,6 @@ export class KanaLoadingScreen extends LitElement {
 
       .loader {
         display: inline-block;
-        font-size: 8rem;
         color: #fff;
         animation: rotation 1.5s linear infinite;
       }
@@ -35,7 +42,7 @@ export class KanaLoadingScreen extends LitElement {
 
   render() {
     return html`
-      <kana-icon class="loader">
+      <kana-icon class="loader" style="font-size=${this.size}">
         sync
       </kana-icon>
     `;

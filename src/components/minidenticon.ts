@@ -1,4 +1,4 @@
-import { identicon } from "minidenticons";
+import { minidenticon as identicon } from "minidenticons";
 import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
 

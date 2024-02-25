@@ -1,4 +1,5 @@
 import { LionButton, LionButtonSubmit } from "@lion/button";
+import { CSSResult as LionCSSResult } from "@lion/core";
 import { css, CSSResult } from "lit";
 import { customElement } from "lit/decorators.js";
 import { interactiveComponentHighlight } from "./common-styles"
@@ -33,7 +34,7 @@ export class KanaButton extends LionButton {
         return [
             ...super.styles,
             ...commonButtonCss
-        ];
+        ] as LionCSSResult[];
     }
 }
 
@@ -51,7 +52,7 @@ export class KanaButtonSubmit extends LionButtonSubmit {
         return [
             ...super.styles,
             ...commonButtonCss
-        ];
+        ] as any;
     }
 
 }
