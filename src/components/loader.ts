@@ -42,7 +42,7 @@ export class LoadingIcon extends LitElement {
 
   render() {
     return html`
-      <kana-icon class="loader" style="font-size=${this.size}">
+      <kana-icon class="loader" style="font-size: ${this.size}">
         sync
       </kana-icon>
     `;
