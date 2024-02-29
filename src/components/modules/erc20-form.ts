@@ -7,6 +7,7 @@ import { MaxUint256, ethers } from "ethers";
 import "../forms/pulpito/pulpito-input";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
 import { KanaloaAPI } from "../../api/kanaloa-ethers";
+import { LitElement } from "@lion/core";
 
 export const ERC20_FORM_TAG = 'erc20-form';
 @customElement(ERC20_FORM_TAG)
@@ -15,7 +16,6 @@ export class ERC20Form extends ModuleForm {
 
     constructor() {
         super();
-        
     }
 
     static get moduleSignature(): string {
@@ -38,8 +38,33 @@ export class ERC20Form extends ModuleForm {
         return ERC20Form.initializerABI;
     }
 
-    async compileModuleParameters(root: any): Promise<ModuleParameters | null> {
+    load(rawData: ethers.BytesLike) {
+        const data = super.load(rawData);
+        
+        // Look, not my proudest hack, but it gets the job done
+        (this.getRootNode() as any).host
+            .newContractBaseWindowlet
+            .value!.formBase
+            .value!.querySelector("#root-name-input")
+            .modelValue = data._name;
+
+        return data;
+    }
+
+    formatHook(d: Record<string, any>): Record<string, any> {
+        d["_supply"] = Number(d["_supply"] / 10n ** d["_decimals"]);
+        d["_decimals"] = Number(d["_decimals"]);
+        return d;
+    }
+
+    async compileModuleParameters(
+        root: any
+    ): Promise<ModuleParameters | null> {
         const form = this.kanaForm;
+
+        if (form == null) {
+            return null;
+        }
 
         form.validate();
         if ((form as KanaForm).hasFeedbackFor.includes('error')) {
@@ -63,6 +88,20 @@ export class ERC20Form extends ModuleForm {
                 ]
             )
         };
+    }
+
+    asUpstream(local: ethers.BytesLike): boolean {
+        // Due to how ERC20 is initialized, it requires an address parameter
+        // that is not returned with peekState. We will truncate the last 32
+        // bytes before comparing
+        
+        // A bit of an explanation on the slicing: 258 is the position at which
+        // the address begins ("0x" + 256 chars). It continues for 64 bytes,
+        // and then it's all the same. The loadedRawData always returns the
+        // zeroth address.
+        const relocal = 
+            local.slice(0, 258) + ethers.ZeroHash.slice(2) + local.slice(322);
+        return relocal == this.loadedRawData;
     }
 
     render() {

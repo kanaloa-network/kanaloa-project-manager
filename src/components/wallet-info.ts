@@ -9,7 +9,7 @@ export class KanaWalletInfo extends LitElement {
     @property({ type: String })
     imageUrl?: string;
 
-    constructor(address: String) {
+    constructor() {
         super();
         KanaloaAPI.subscribe(this);
     }

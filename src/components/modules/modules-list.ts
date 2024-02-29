@@ -5,19 +5,17 @@ import { ModuleParams } from "./commons";
 export const BASIC_MODULES = [
     { 
         name: "ERC20", 
-        value: "erc20", 
         signature: ERC20Form.moduleSignature, 
         customElement: ERC20_FORM_TAG 
     },
     //{ name: "ERC721", value: "erc721", customElement: ERC20_FORM_TAG }
 ] as ModuleParams[];
-export type BasicModule = (typeof BASIC_MODULES)[number]["value"]; 
+export type BasicModule = (typeof BASIC_MODULES)[number]["signature"]; 
 
 export const PLUGIN_MODULES: Record<BasicModule, ModuleParams[]> = {
-    "erc20": [
+    [ERC20Form.moduleSignature]: [
         { 
             name: "Mint/burn and variable supply", 
-            value: "erc20_mint-burn",
             signature: ERC20MintBurnForm.moduleSignature,
             customElement: ERC20_MINT_BURN_FORM_TAG 
         },

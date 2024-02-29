@@ -1,8 +1,9 @@
 import { 
-    AbstractProvider, Addressable, Contract, Signer, ethers 
+    AbstractProvider, Contract, Signer, ethers 
 } from "ethers";
 import { KanaloaEthers, requireConnection } from "./kanaloa-ethers";
 import KanaloaAddressBook from "kanaloa-address-book.json";
+import { ModuleOps, ModuleParameters } from "./kanaloa-project-registry";
 
 export const PAYMENTS_PROCESSOR_ADDRESS: string = 
     KanaloaAddressBook["PaymentsProcessor"];
@@ -29,16 +30,9 @@ export enum TaxableOperations {
     EDIT_MODULE = 5
 }
 
-export enum ModuleOps {
-    INSTALL = 0,
-    UNINSTALL = 1,
-    UPGRADE = 2,
-    REINITIALIZE = 3
-}
-
 export interface TaxablePayload {
     target?: string,
-    payload?: [string, string] | [number, [string, string]],
+    payload?: ModuleParameters[] | [ModuleOps, ModuleParameters][],
     token: string,
     client: string
 }
@@ -57,6 +51,11 @@ export async function calculateInvoice(
     mode: TaxableOperations, params: TaxablePayload, wallet: AbstractProvider
 ): Promise<bigint | undefined>  {
     const paymentsProcessor = getPaymentsProcessorContract(wallet);
+    const serialize = (mode == TaxableOperations.NEW_CONTRACT) ?
+        (p: ModuleParameters) => 
+            [p.moduleSignature, p.initParams] :
+        (p: [ModuleOps, ModuleParameters]) => 
+            [p[0], [p[1].moduleSignature, p[1].initParams]]
     const [success, cost]: [boolean, bigint] =
         (mode == TaxableOperations.NEW_PROJECT) ?
             [true, await paymentsProcessor.getOperationCost(
@@ -69,7 +68,7 @@ export async function calculateInvoice(
                         : "calculateModifyContractInvoice"
             ](
                         params.target!,
-                        params.payload!,
+                        params.payload!.map(serialize as any),
                         params.token,
                         params.client
             );
@@ -106,10 +105,9 @@ export class PaymentsProcessor {
             );
 
         if (allowance < amount) {
-            const askFor: bigint = amount - allowance;
             try {
                 await (
-                    await token.approve(PAYMENTS_PROCESSOR_ADDRESS, askFor)
+                    await token.approve(PAYMENTS_PROCESSOR_ADDRESS, amount)
                 ).wait()
             } catch (err) {
                 return false;

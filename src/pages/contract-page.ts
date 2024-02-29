@@ -15,11 +15,12 @@ import { headerStyles } from '../components/common-styles';
 import { eventHandler, handlerSetup } from '../utils/event-handler';
 import { when } from 'lit/directives/when.js';
 import KanaloaAddressBook from "kanaloa-address-book.json";
-import { Contract, ethers } from 'ethers';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
-import { ModuleParameters } from 'src/api/kanaloa-project-registry';
+import { ModuleOps, ModuleParameters } from 'src/api/kanaloa-project-registry';
 import { ModulesWindowlet } from '../components/modules/modules-windowlet';
 import '../components/modules/modules-windowlet';
+import { TaxableOperations } from '../api/payments-processor';
+import { until } from 'lit/directives/until.js';
 
 
 @customElement('contract-page')
@@ -35,7 +36,9 @@ export class ContractPage extends LitElement {
     declare contractName: string | undefined;
     @property({ type: Boolean })
     declare expandedMode: boolean;
-
+    
+    @state()
+    declare price: Promise<number | undefined>;
     @state()
     declare selectedBaseModule: ModuleParams;
     @state()
@@ -55,6 +58,7 @@ export class ContractPage extends LitElement {
         this.modulesList = createRef();
         this.formWindowlet = createRef();
         this.newContractBaseWindowlet = createRef();
+        this.price = new Promise((res) => res(undefined));
         handlerSetup(this);
         loadDefaultFeedbackMessages();
     }
@@ -100,62 +104,67 @@ export class ContractPage extends LitElement {
     }
 
     async submitHandler(ev: Event) {
+        if (!this.expandedMode) {
+            return;
+        }
         const modules: ModuleForm[] = 
-            this.modulesList.value?.selectedModules || [];
+            Array.from(
+                this.modulesList.value?.getSelectedModules().values()!
+            ) || [];
 
         if (modules.length == 0) {
             // Technically unreachable under regular circumstances
             console.log("How did you get here?");
         }
 
-        const root: any = 
-            this.newContractBaseWindowlet.value?.formBase.value?.modelValue;
-        const genesisModules: ModuleParameters[] = [];
-        for (const form of modules) {
-            root[form.moduleSignature] = form.modelValue;
-        }
-        for (const form of modules) {
-            const compiledModule = await form.compileModuleParameters(root);
-            if (compiledModule == null) {
-                return;
-            }
-            genesisModules.push(compiledModule);
-        }
+        const use = (this.contract === undefined) ? 
+                (ops: any) => () =>
+                    KanaloaAPI.projectRegistry.newContract({
+                        name: this.getRoot().name,
+                        project: this.projectName,
+                        genesisModules: ops as ModuleParameters[],
+                        payment: KanaloaAddressBook.KANA
+                    }) :
+                (ops: any) => () => 
+                    KanaloaAPI.projectRegistry.modifyContract({
+                        project: this.projectName,
+                        target: this.contract!,
+                        moduleOperations: ops as [ModuleOps, ModuleParameters][],
+                        payment: KanaloaAddressBook.KANA
+                    });
 
-        const kanaToken: Contract = new Contract(
-            KanaloaAddressBook.KANA, [ 
-                "function allowance(address owner, address spender) view returns (uint256)",
-                "function approve(address spender, uint256 amount) returns (bool)"
-            ], await KanaloaAPI.signer!
-        );
+        this.compile()
+            .then((ops) => { 
+                if (ops == null || ops.length == 0) {
+                    throw new Error("Attempting to execute a no-op");
+                }
 
-        const hasAllowance: bigint = 
-            await kanaToken.allowance(
-                KanaloaAPI.signer, 
-                KanaloaAddressBook.PaymentsProcessor
-            );
-
-        if (hasAllowance < BigInt(ethers.parseUnits("320000"))) {
-            await (
-                await kanaToken.approve(
-                    KanaloaAddressBook.PaymentsProcessor, 
-                    ethers.parseUnits("320000")
-                )
-            ).wait();
-        }
-
-        KanaloaAPI.projectRegistry.newContract({
-              name: root.name,
-              project: this.projectName,
-              genesisModules: genesisModules,
-              payment: KanaloaAddressBook.KANA
-        });
-        
+                this.getInvoice(ops!)
+                    .then((invoice) => {
+                        if (invoice) {
+                            return KanaloaAPI.paymentsProcessor
+                                .requestAllowance(invoice)
+                        }
+                        throw new Error("Invoice is undefined")
+                    })
+                    .then((allowance) => {
+                        if (allowance) {
+                            return true;
+                        }
+                        throw new Error("Allowance request rejected")
+                    })
+                    .then(
+                        use(ops)
+                    ).catch(console.error)
+                })
+            .catch(console.error)
     }
 
     @eventHandler("submit-form", { capture: true })
     captureSubmit() {
-        this.shadowRoot!.querySelector("kana-form")!.dispatchEvent(new Event("submit"))
+        this.shadowRoot!
+            .querySelector("kana-form")!
+            .dispatchEvent(new Event("submit"))
     }
     
 
@@ -172,12 +181,61 @@ export class ContractPage extends LitElement {
 
     @eventHandler("selected-modules-updated", { capture: true })
     selectedModulesUpdated(ev: CustomEvent) {
-        // TODO: recalc price
         this.requestUpdate();
+        setTimeout(() => this.recalculatePrice(), 0);
+    }
+
+    @eventHandler("payload-modified", { capture: true })
+    recalculatePrice(ev?: CustomEvent) {
+        this.price = this.compile(false)
+            .then((ops) => {
+                if (ops == null) {
+                    throw new Error("Could not generate payload")
+                }
+                return this.getInvoice(ops);
+            })
+            .then((price) => {
+                if (price == null) {
+                    throw new Error("Could not calculate price")
+                }
+
+                return Number(price / 10n ** 18n);
+            })
+    }
+
+    async getInvoice(
+        operations: ModuleParameters[] | [ModuleOps, ModuleParameters][]
+    ) {
+        return await KanaloaAPI.paymentsProcessor.calculateInvoice(
+            (this.contract) ? 
+                TaxableOperations.EDIT_CONTRACT : 
+                TaxableOperations.NEW_CONTRACT,
+            {
+                target: this.projectAddress,
+                payload: operations,
+                token: KanaloaAPI.KANA_TOKEN,
+                client: await (await KanaloaAPI.signer)!.getAddress()!
+            }
+        );
+    }
+
+    getRoot() {
+        const base = 
+            this.newContractBaseWindowlet.value?.formBase.value?.modelValue;
+        this.modulesList.value?.getSelectedModules().forEach(
+            (v, k) => base[k] = v.modelValue
+        );
+
+        return base;
+    }
+
+    async compile(strict: boolean = true) {
+        const root = this.getRoot();
+        return this.modulesList.value?.compile(root, strict);        
     }
 
     render() {
-        console.log(this.modulesList.value?.selectedModules);
+        const forms = this.modulesList.value?.getSelectedModules().values();
         return html`
             ${
                 when(
@@ -202,7 +260,11 @@ export class ContractPage extends LitElement {
                                 .moduleList=${this.basicModules}
                                 contract="${this.contract}"
                                 .selectedBaseModule=${this.selectedBaseModule}
-                                name="${(this.contractName != null) ? this.contractName : ""}"
+                                .price=${this.price}
+                                name="${
+                                    (this.contractName != null) ? 
+                                        this.contractName : ""
+                                }"
                             >
                             </contract-base-windowlet>
                         </kana-fieldset>
@@ -212,6 +274,7 @@ export class ContractPage extends LitElement {
                                 <modules-windowlet
                                     ${ref(this.modulesList)}
                                     .baseModule=${this.selectedBaseModule}
+                                    contractAddress="${this.contract}"
                                 >
                                 </modules-windowlet>
                             ` : ""
@@ -222,8 +285,7 @@ export class ContractPage extends LitElement {
                             html`
                                 <kana-windowlet ${ref(this.formWindowlet)}>
                                     ${
-                                        
-                                        this.modulesList.value?.selectedModules
+                                        Array.from(forms || [])
                                             .map((x) => html`<div>${x}</div>`)
                                     }
                                 </kana-windowlet>
@@ -245,34 +307,50 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
     declare contract: string;
     
     @state()
+    declare price: Promise<number | undefined>;
+    @state()
     declare moduleList: ModuleParams[];
-
     @state()
     declare selectedBaseModule: ModuleParams;
-
     @state()
     declare formBase: Ref<KanaForm>;
+    
 
     constructor() {
         super();
         this.formBase = createRef();
+        this.price = new Promise((res) => res(undefined));
     }
 
     connectedCallback(): void {
         super.connectedCallback();
-
     }
 
     static get styles() {
         return [
             ...super.styles,
-            ...formCssCommon
+            ...formCssCommon,
+            css`
+                span {
+                    margin-left: 10px;
+                    line-height: 1em;
+                }
+                
+                kana-icon {
+                    font-size: 1.4em;
+                }
+
+                loading-icon {
+                    margin-left: 10px;
+                }
+            `
         ]
     }
 
     selectContractType(ev: Event) {
         const selected = (ev.target as KanaSelect).value;
-        this.selectedBaseModule = this.moduleList.find((m) => m.value == selected)!;
+        this.selectedBaseModule = 
+            this.moduleList.find((m) => m.signature == selected)!;
         this.dispatchEvent(
             new CustomEvent(
                 "base-selected", 
@@ -289,6 +367,26 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
     }
 
     render() {
+        const preliminaryCost = until(
+            this.price.then((price) => {
+                return html`
+                    <span>
+                        ${
+                            (price != undefined) ? 
+                                `(${price} $KANA)` :
+                                html`<kana-icon>pending</kana-icon>`
+                        }
+                    </span>
+                `;
+            }).catch((e) => {
+                console.error(e);
+                return html`<kana-icon>error</kana-icon>`
+            }),
+            html`<loading-icon size="1.4em"></loading-icon>`
+        );
+        const buttonContents = 
+            (this.contract) ? 
+                html`Update ${this.name}` : "Deploy new contract";
         return html`
             <kana-form ${ref(this.formBase)}>
                 <form>
@@ -302,6 +400,7 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
                     <label>Project info</label>
                     <div class="form-row">
                         <kana-input
+                            id="root-name-input"
                             label-sr-only="Contract name"
                             placeholder="Contract name"
                             name="name"
@@ -310,7 +409,10 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
                                 new Required()
                             ]}"
                             .preprocessor=${maxLengthPreprocessor(16)}
-                            @input=${(ev: Event) => this.name = (ev.target as KanaInput).value}
+                            @input=${
+                                (ev: Event) => 
+                                    this.name = (ev.target as KanaInput).value
+                            }
                         ></kana-input>
                         <kana-select
                             label-sr-only="Contract type"
@@ -320,7 +422,7 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
                             .validators=${[ new Required() ]}
                             @change=${this.selectContractType}
                             .modelValue=${
-                                this.selectedBaseModule?.value
+                                this.selectedBaseModule?.signature
                             }
                             disabled=${this.contract || nothing }
                         >
@@ -331,11 +433,11 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
                                 ${repeat(
                                     this.moduleList, 
                                     (k: any) => k.value, 
-                                    (item: any) => {
+                                    (item: ModuleParams) => {
                                         return html`
                                             <option
                                                 name="${item.name}"
-                                                value="${item.value}"
+                                                value="${item.signature}"
                                             >
                                                 ${item.name}
                                             </option>
@@ -346,17 +448,20 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
                         </kana-select>
                     </div>
                     <div class="form-row">
-                        <kana-button-submit @click=${
-                            () => this.dispatchEvent(
-                                new CustomEvent(
-                                    'submit-form', 
-                                    { bubbles: true, composed: true }
-                            )
-                        )}>
-                            ${
-                                (this.contract) ?
-                                    "Update" : "Deploy new contract (320000 $KANA)"
+                        <kana-button-submit 
+                            @click=${
+                                () => this.dispatchEvent(
+                                    new CustomEvent(
+                                        'submit-form', 
+                                        { bubbles: true, composed: true }
+                                    )
+                                )
                             }
+                            disabled=${
+                                this.selectedBaseModule == null || nothing
+                            }
+                        >
+                            ${buttonContents}${preliminaryCost}
                         </kana-button-submit>
                     </div>
                 </form>

@@ -19,7 +19,12 @@ export const PROJECT_REGISTRY_ABI = [
     `function newContract(`
         + `string name, string project, `
         + `tuple(bytes32, bytes)[] genesisModules, address payment`
-    + `) returns (address)`
+    + `) returns (address)`,
+    `function modifyContract(`
+        + `string project, address target, `
+        + `tuple(uint8, tuple(bytes32, bytes))[] moduleOperations, `
+        + `address payment`
+    + `)`
 ]
 
 
@@ -36,6 +41,13 @@ export interface ProjectData {
     description: string;
 }
 
+export enum ModuleOps {
+    INSTALL = 0,
+    UNINSTALL = 1,
+    UPGRADE = 2,
+    REINITIALIZE = 3
+}
+
 export interface ModuleParameters {
     moduleSignature: string,
     initParams: string
@@ -47,6 +59,14 @@ export interface NewContractConfigProps {
     genesisModules: ModuleParameters[],
     payment: string
 }
+
+export interface ModifyContractProps {
+    project: string,
+    target: string,
+    moduleOperations: [ModuleOps, ModuleParameters][],
+    payment: string
+}
+
 
 function getRegistryContract(provider: Signer | AbstractProvider): Contract {
     return new Contract(
@@ -87,6 +107,26 @@ export async function newContract(
             params.project,
             params.genesisModules.map(
                 (m) => [ m.moduleSignature, m.initParams ]
+            ),
+            KanaloaAddressBook.KANA
+        )
+    ).wait();
+
+    return tx;
+}
+
+export async function modifyContract(
+    params: ModifyContractProps,
+    signer: Signer
+): Promise<string | Addressable> {
+    const projectRegistry = getRegistryContract(signer);
+
+    const tx = await (
+        await projectRegistry.modifyContract(
+            params.project,
+            params.target,
+            params.moduleOperations.map(
+                (m) => [m[0], [m[1].moduleSignature, m[1].initParams]]
             ),
             KanaloaAddressBook.KANA
         )
@@ -141,6 +181,9 @@ export class ProjectRegistry {
 
     async newContract(contractParams: NewContractConfigProps) {
         await newContract(contractParams, (await this.parent.signer)!);
+    }
 
+    async modifyContract(contractParams: ModifyContractProps) {
+        await modifyContract(contractParams, (await this.parent.signer)!);
     }
 }

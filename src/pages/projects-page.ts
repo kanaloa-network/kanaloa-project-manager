@@ -46,7 +46,7 @@ export class ProjectsPage extends AbstractCardsPage {
                 if (
                     (
                         await proj.balanceOf(
-                            await KanaloaAPI.requestSigner()
+                            await (await KanaloaAPI.signer)?.getAddress()
                         )
                     ) != 0
                 ) {
@@ -62,7 +62,9 @@ export class ProjectsPage extends AbstractCardsPage {
                         description: project.description
                     }))
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         this.isLoading = false;

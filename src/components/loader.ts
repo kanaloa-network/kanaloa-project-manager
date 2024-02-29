@@ -25,7 +25,6 @@ export class LoadingIcon extends LitElement {
 
       .loader {
         display: inline-block;
-        color: #fff;
         animation: rotation 1.5s linear infinite;
       }
 

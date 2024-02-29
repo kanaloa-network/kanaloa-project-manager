@@ -201,7 +201,7 @@ export class NewProjectPage extends LitElement {
 
       };
 
-    private calculatedCost = new Task(this, {
+      private calculatedCost = new Task(this, {
         task: async ([token]) => {
             const client = await (await KanaloaAPI.signer)!.getAddress();
             const projectCost = 

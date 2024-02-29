@@ -76,9 +76,8 @@ export class KanaloaEthers {
         value.then(() => {
             this.subscribedElements.forEach(
                 (elem) => elem.dispatchEvent(walletChangedEvent)
-                );
-            }
-        );       
+            );
+        });       
     }
 
     _avatar?: AvatarResult;
@@ -109,7 +108,7 @@ export class KanaloaEthers {
             // Defaults to connecting to Ethereum mainnet via INFURA or
             // something like that, I dunno.
             this.wallet = ethers.getDefaultProvider("mainnet");
-            this._signer = new Promise(() => undefined);
+            this._signer = new Promise((res) => res(undefined));
         }
     }
 

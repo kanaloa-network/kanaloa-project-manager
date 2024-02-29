@@ -14,7 +14,7 @@ class EqualOrMoreThan extends Validator {
   
     execute(modelValue: any, small: ERC20Form) {
         try {
-            return !(BigInt(modelValue) >= BigInt(small.modelValue._supply))
+            return !(BigInt(modelValue) >= BigInt(small.modelValue?._supply))
         } catch (err) {
             return true;
         }
@@ -43,14 +43,31 @@ export class ERC20MintBurnForm extends ModuleForm {
             ["maxSupply", "uint256"], 
         ]);
     }
-
+        
     public erc20Form: ERC20Form | null = null; 
     setParent(ref: ModuleForm): void {
         this.erc20Form = ref as ERC20Form;
     }
 
+    formatHook(d: Record<string, any>): Record<string, any> {
+        if (this.erc20Form == null) {
+            return d;
+        }
+        d["maxSupply"] = 
+            Number( // Ensures Lion will not cry with its validator
+                d["maxSupply"] / 10n ** BigInt(
+                    this.erc20Form.modelValue?._decimals || 18
+                )
+            );
+        return d;
+    }
+    
     async compileModuleParameters(root: any): Promise<ModuleParameters | null> {
         const form = this.kanaForm;
+
+        if (form == null) {
+            return null;
+        }
 
         form.formElements.forEach(
             // Whomst, in their right mind, caches validation results? 
@@ -74,7 +91,7 @@ export class ERC20MintBurnForm extends ModuleForm {
                     BigInt(
                         model.maxSupply
                     ) * 10n ** BigInt(
-                        root[ERC20Form.moduleSignature]._decimals
+                        root[ERC20Form.moduleSignature]?._decimals
                     )
                 ]
             )
@@ -109,6 +126,7 @@ export class ERC20MintBurnForm extends ModuleForm {
                                 ]}"
                                 .modelValue=${21000000}
                                 .preprocessor=${maxNumberPreprocessor(MaxUint256)}
+                                ?readonly=${this.loadedRawData != null}
                             ></kana-input-amount>
                         </span>
                     </div>
