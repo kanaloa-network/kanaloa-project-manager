@@ -9,6 +9,7 @@ import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
 import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { TaxableOperations } from '../api/payments-processor';
 import { LoadingIcon } from '../components/loader';
+import { Router } from '@vaadin/router';
 
 
 @customElement('new-project-page')
@@ -197,7 +198,10 @@ export class NewProjectPage extends LitElement {
             abbreviation: formData.abbreviation,
             description: formData.description
         })
-
+        .then(
+            () => Router.go(`/projects/`)
+        )
+        .catch(console.error)
 
       };
 

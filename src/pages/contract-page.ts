@@ -21,6 +21,7 @@ import { ModulesWindowlet } from '../components/modules/modules-windowlet';
 import '../components/modules/modules-windowlet';
 import { TaxableOperations } from '../api/payments-processor';
 import { until } from 'lit/directives/until.js';
+import { Router } from '@vaadin/router';
 
 
 @customElement('contract-page')
@@ -155,7 +156,11 @@ export class ContractPage extends LitElement {
                     })
                     .then(
                         use(ops)
-                    ).catch(console.error)
+                    )
+                    .then(
+                        () => Router.go(`/projects/${this.projectAddress}`)
+                    )
+                    .catch(console.error)
                 })
             .catch(console.error)
     }
