@@ -1,8 +1,11 @@
-import { html, css, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
+import { html, css, LitElement, nothing } from "lit";
+import { customElement, property } from "lit/decorators.js";
 
 @customElement('kana-icon')
 export class KanaIcon extends LitElement {
+    @property({ type: String })
+    declare size: string;
+
     static get styles() {
         return [
             css`
@@ -17,7 +20,6 @@ export class KanaIcon extends LitElement {
                     font-family: 'Material Icons';
                     font-weight: normal;
                     font-style: normal;
-                    font-size: 24px;
                     line-height: 1;
                     letter-spacing: normal;
                     text-transform: none;
@@ -30,6 +32,10 @@ export class KanaIcon extends LitElement {
         ]
     }
     override render() {
-        return html`<span><slot></slot></span>`;
+        return html`
+            <span style="${(this.size) ? `font-size: ${this.size}` : nothing}">
+                <slot></slot>
+            </span>
+        `;
     }
 }

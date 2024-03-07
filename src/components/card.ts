@@ -1,7 +1,9 @@
 import { LitElement, html, css, HTMLTemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { foreground, Shade } from './common-styles';
+import { foreground } from './common-styles';
+import "./icon";
 import "./minidenticon";
+import "./address";
 import { ifDefined } from 'lit/directives/if-defined.js';
 
 interface ButtonProps {
@@ -110,6 +112,13 @@ export class KanaCard extends LitElement {
 					text-decoration: none;
 					color: inherit;
 				}
+
+                evm-address {
+                    width: 100%;
+                    margin-top: 15px;
+                    justify-content: center;
+                    font-size: 0.9rem;
+                }
             `,
             foreground(),
         ];
@@ -119,7 +128,7 @@ export class KanaCard extends LitElement {
         return html`
             <div class="title-row">
                 <h2>${this.name}</h2>
-		${"" /* TODO:
+		    ${"" /* TODO:
           		<a href="PROJECT_ID_OR_SIMILAR" class="project-link">
             			<kana-icon>settings</kana-icon>
 			</a>
@@ -137,6 +146,14 @@ export class KanaCard extends LitElement {
                     ${this.button.text}
                 </kana-button>
             </a>
+            ${(this.address) ? 
+                html`
+                    <evm-address address="${ifDefined(this.address)}" 
+                        abridged 
+                        clipboard
+                    >
+                    </evm-address>` 
+                : ""}
         `;
     }
 }

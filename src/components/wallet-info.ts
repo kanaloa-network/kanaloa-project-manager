@@ -3,6 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { genSvgDataSrc } from './minidenticon';
+import "./icon";
+import './address';
 
 @customElement('kana-wallet-info')
 export class KanaWalletInfo extends LitElement {
@@ -71,9 +73,7 @@ export class KanaWalletInfo extends LitElement {
                         <img class="wallet-img" 
                             src="${this.imageUrl as string || genSvgDataSrc(a)}" 
                             alt="Wallet icon" />
-                        <span class="wallet-address">
-                            ${a.slice(0, 6)}...${a.slice(-4)}
-                        </span>
+                        <evm-address address="${a}" abridged></evm-address>
                         <kana-icon><a href="/projects">menu</a></kana-icon>
                     `
                 })
