@@ -5,7 +5,7 @@ import '../components/button';
 import '../components/card';
 import '../components/loader';
 import { headerStyles } from '../components/common-styles';
-import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
+import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { AbstractCardsPage } from './abstract-cards-page';
 import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
@@ -25,7 +25,7 @@ export class ProfilePage extends AbstractCardsPage {
     async fetchData() {
         this.isLoading = true;
         
-        if (GlobalKanaloaEthers.readOnly) {
+        if (KanaloaAPI.readOnly) {
             this.isLoading = false;
             this.items = [];
         }
