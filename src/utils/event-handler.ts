@@ -18,7 +18,7 @@ export function eventHandler(
         if (target._eventHandlers == null) {
             Object.defineProperty(
                 target, "_eventHandlers", 
-                { 
+                {
                     enumerable: false,
                     value: [] 
                 }

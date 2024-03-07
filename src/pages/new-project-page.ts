@@ -1,11 +1,16 @@
 import { LitElement, html, css } from 'lit';
+import { Task } from '@lit/task';
 import { customElement } from 'lit/decorators.js';
 import "../components/forms/forms"
 import "../components/windowlet"
 import { MinMaxLength, Required } from "@lion/form-core"
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
 import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
-import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
+import { KanaloaAPI } from '../api/kanaloa-ethers';
+import { TaxableOperations } from '../api/payments-processor';
+import { LoadingIcon } from '../components/loader';
+import { Router } from '@vaadin/router';
+
 
 @customElement('new-project-page')
 export class NewProjectPage extends LitElement {
@@ -110,7 +115,10 @@ export class NewProjectPage extends LitElement {
                     box-shadow: 0 0 0 2px var(--highlighted-light-color);
                 }
                 
-                
+                span {
+                    margin-left: 10px;
+                }
+                       
                 kana-button-submit {
                     min-width: fit-content;
                     flex: 1;
@@ -170,20 +178,57 @@ export class NewProjectPage extends LitElement {
           return;
         }
         const formData = ev.target.modelValue;
+        
+        const projectCost = 
+            await KanaloaAPI.paymentsProcessor.calculateInvoice(
+                TaxableOperations.NEW_PROJECT,
+                { 
+                    client: await (await (await KanaloaAPI.signer)!).getAddress(),
+                    token: KanaloaAPI.KANA_TOKEN
+                }
+            );
 
-        GlobalKanaloaEthers.projectRegistry.newProject({
+        if (await KanaloaAPI.paymentsProcessor.requestAllowance(projectCost!) == false) {
+            return;
+        }
+
+
+        await KanaloaAPI.projectRegistry.newProject({
             projectName: formData.name,
             abbreviation: formData.abbreviation,
-            description: formData.description,
-            visibility: 0
-        });
-        // fetch('/api/foo/', {
-        //   method: 'POST',
-        //   body: JSON.stringify(formData),
-        // });
+            description: formData.description
+        })
+        .then(
+            () => Router.go(`/projects/`)
+        )
+        .catch(console.error)
+
       };
 
+      private calculatedCost = new Task(this, {
+        task: async ([token]) => {
+            const client = await (await KanaloaAPI.signer)!.getAddress();
+            const projectCost = 
+                await KanaloaAPI.paymentsProcessor.calculateInvoice(
+                    TaxableOperations.NEW_PROJECT,
+                    { 
+                        client: client,
+                        token: token
+                    }
+                );
+                return projectCost!;
+            },
+            args: () => [KanaloaAPI.KANA_TOKEN]
+        }
+    );
+
     render() {
+        const cost = this.calculatedCost.render({
+            pending: () => html`<span><loading-icon size="1em"><loading-icon></span>`,
+            complete: (value) => html`<span>(${value / 10n ** 18n} $KANA)</span>`,
+            error: (error) => html`<p>(${error} ????)</p>`,
+        });
+
         return html`
             <h1>New Project</h1>
             <kana-windowlet>
@@ -228,36 +273,8 @@ export class NewProjectPage extends LitElement {
                             ></kana-input>
                         </div>
                         <div class="form-row">
-                            <kana-select
-                                label-sr-only="Visibility"
-                                name="visibility"
-                                placeholder="Visibility"
-                                .validators=${[ new Required() ]}
-                            >
-                                <select name="visibility-select" slot="input">
-                                    <option 
-                                        hidden
-                                        selected
-                                        value=""
-                                    >
-                                        Visibility
-                                    </option>
-                                    <option 
-                                        name="public" 
-                                        value="public">
-                                        Public
-                                    </option>
-                                    <option 
-                                        name="unlisted" 
-                                        value="unlisted">
-                                        Unlisted
-                                    </option>
-                                </select>
-                            </kana-select>
-                        </div>
-                        <div class="form-row">
                             <kana-button-submit>
-                                Deploy new project
+                                Deploy new project ${cost}
                             </kana-button-submit>
                         </div>
                     </form>

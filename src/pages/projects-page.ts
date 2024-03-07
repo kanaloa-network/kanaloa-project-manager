@@ -6,19 +6,18 @@ import '../components/card';
 import '../components/loader';
 import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
-import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
+import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { Contract } from 'ethers';
 import { AbstractCardsPage } from './abstract-cards-page';
-
 
 @customElement('projects-page')
 export class ProjectsPage extends AbstractCardsPage {
     async fetchData() {
         this.isLoading = true;
         const projects = 
-            await GlobalKanaloaEthers.projectRegistry.getProjects();
+            await KanaloaAPI.projectRegistry.getProjects();
         
-        if (GlobalKanaloaEthers.readOnly) {
+        if (KanaloaAPI.readOnly) {
             this.isLoading = false;
             this.items = [];
         }
@@ -32,29 +31,39 @@ export class ProjectsPage extends AbstractCardsPage {
             // 2 - the visibility of the project, which is irrelevant here
             // 3 - the description of the project
             const proj = new Contract(
-                project[0],
+                project.address,
                 [
                     "function balanceOf(address owner) view returns (uint256 balance)",
                     "function name() view returns (string)",
                     "function symbol() view returns (string)"
                 ],
-                GlobalKanaloaEthers.wallet
+                KanaloaAPI.wallet
             );
 
             // NOTE/TODO: The most innefficient way to do this
             // Move to a subgraph and a Promise.all in production
-            if (await proj.balanceOf(GlobalKanaloaEthers.address) != 0) {
-                const address: string = project[0];
-                const name: string = await proj.name();
-                response.push(new KanaCard({
-                    name: name,
-                    button: {
-                        text: "Contracts",
-                        link: `/projects/${address}`
-                    },
-                    address: address,
-                    description: project[3]
-                }))
+            try {
+                if (
+                    (
+                        await proj.balanceOf(
+                            await (await KanaloaAPI.signer)?.getAddress()
+                        )
+                    ) != 0
+                ) {
+                    const address: string = project.address;
+                    const name: string = project.project;
+                    response.push(new KanaCard({
+                        name: name,
+                        button: {
+                            text: "Contracts",
+                            link: `/projects/${address}`
+                        },
+                        address: address,
+                        description: project.description
+                    }))
+                }
+            } catch (err) {
+                console.error(err);
             }
         }
 
@@ -69,7 +78,7 @@ export class ProjectsPage extends AbstractCardsPage {
                 ${
                     when(
                         this.isLoading,
-                        () => html`<kana-loading-screen></kana-loading-screen>`,
+                        () => html`<loading-icon></loading-icon>`,
                         () => repeat(
                                 this.items, 
                                 (k) => k.name, 

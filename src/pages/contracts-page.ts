@@ -6,7 +6,7 @@ import '../components/card';
 import '../components/loader';
 import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
-import { GlobalKanaloaEthers } from '../api/kanaloa-ethers';
+import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { AddressLike, Contract } from 'ethers';
 import { AbstractCardsPage } from './abstract-cards-page';
 
@@ -29,9 +29,10 @@ export class ContractsPage extends AbstractCardsPage {
                 "function balanceOf(address owner) view returns (uint256 balance)",
                 "function name() view returns (string)",
                 "function symbol() view returns (string)",                
-                "function contractsRepositoryLength() view returns (uint256)"
+                "function contractsRepositoryLength() view returns (uint256)",
+                "function getContracts(uint256 from, uint256 to) view returns (address[])"
             ],
-            GlobalKanaloaEthers.wallet
+            KanaloaAPI.wallet
         );
 
         const contractAbi: string[] = [
@@ -49,15 +50,15 @@ export class ContractsPage extends AbstractCardsPage {
                 const contract: Contract = new Contract(
                     address as string,
                     contractAbi,
-                    GlobalKanaloaEthers.wallet
+                    KanaloaAPI.wallet
                 );
 
                 const name: string = await contract.name();
                 response.push(new KanaCard({
                     name: name,
                     button: {
-                        text: "Contracts",
-                        link: `/contracts/${address}`
+                        text: "Edit",
+                        link: `${this.address}/${address}`
                     },
                     address: address as string,
                     description: "" // this should be the list of modules
@@ -77,7 +78,7 @@ export class ContractsPage extends AbstractCardsPage {
                 ${
                     when(
                         this.isLoading,
-                        () => html`<kana-loading-screen></kana-loading-screen>`,
+                        () => html`<loading-icon></loading-icon>`,
                         () => repeat(
                                 this.items, 
                                 (k) => k.name, 

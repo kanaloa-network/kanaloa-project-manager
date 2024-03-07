@@ -5,6 +5,8 @@ import {
 import { AvatarResult } from "ethers/lib.commonjs/providers/ens-resolver";
 import { LitElement } from "lit";
 import { ProjectRegistry } from "./kanaloa-project-registry";
+import { PaymentsProcessor } from "./payments-processor";
+import KanaloaAddressBook from "kanaloa-address-book.json";
 
 declare module window {
     export const ethereum: Eip1193Provider | undefined;
@@ -26,14 +28,14 @@ export function requireConnection(
     let original = descriptor.value;
     descriptor.value =
         async (...args: unknown[]): Promise<unknown> => {
-            if (GlobalKanaloaEthers.signer != undefined) {
+            if (KanaloaAPI.signer != undefined) {
                 // We are already connected
                 return original.apply(target, args)
             }
 
             // We have a BrowserProvider, but the wallet is not 
             // connected yet. Request permission from the user
-            return GlobalKanaloaEthers
+            return KanaloaAPI
                 .requestSigner()
                 .then(
                     () => original.apply(target, args)
@@ -54,34 +56,28 @@ function requestUpdateSubscribers(ev: Event) {
 export class KanaloaEthers {
     private subscribedElements: Set<LitElement> = new Set<LitElement>();
 
+    readonly KANA_TOKEN = KanaloaAddressBook.KANA;
+
     projectRegistry: ProjectRegistry;
+    paymentsProcessor: PaymentsProcessor;
 
     wallet: BrowserProvider | AbstractProvider;
-    _signer?: Signer;
-    get signer(): Signer | undefined {
+    private _signer: Promise<Signer | undefined>;
+    get signer(): Promise<Signer | undefined> {
         return this._signer;
     }
-    set signer(value: Signer | undefined) {
+    set signer(value: Promise<Signer | undefined>) {
         this._signer = value;
 
         if (value == undefined) {
             return;
         }
 
-        let address = 
-            value.getAddress()
-                .then((add) => {
-                    this._address = add;
-                    this.subscribedElements.forEach(
-                        (elem) => elem.dispatchEvent(walletChangedEvent)
-                     );
-                    }
-                )            
-    }
-    
-    _address?: AddressLike;
-    get address(): AddressLike | undefined {
-        return this._address;
+        value.then(() => {
+            this.subscribedElements.forEach(
+                (elem) => elem.dispatchEvent(walletChangedEvent)
+            );
+        });       
     }
 
     _avatar?: AvatarResult;
@@ -91,29 +87,28 @@ export class KanaloaEthers {
 
     constructor() {
         this.projectRegistry = new ProjectRegistry(this);
+        this.paymentsProcessor = new PaymentsProcessor(this);
         
         if (window.ethereum != null) {
             this.wallet = new ethers.BrowserProvider(window.ethereum);
 
-            (this.wallet as BrowserProvider)
-                .listAccounts()
-                .then(
-                    // if this returns results, we have permission to connect
-                    () => {
-                        return (this.wallet as BrowserProvider).getSigner();
-                    }
-                )
-                .then(
-                    (acc) => {
-                        this.signer = acc;
-                    }
-                );
+            this._signer = 
+                (this.wallet as BrowserProvider)
+                    .listAccounts()
+                    .then(
+                        // if this returns results, we have permission to connect
+                        () => {
+                            return (this.wallet as BrowserProvider).getSigner();
+                        }
+                ) as Promise<Signer | undefined>;
+            this.signer = this._signer;
 
             // TODO: perform event hooking here
         } else {
             // Defaults to connecting to Ethereum mainnet via INFURA or
             // something like that, I dunno.
             this.wallet = ethers.getDefaultProvider("mainnet");
+            this._signer = new Promise((res) => res(undefined));
         }
     }
 
@@ -128,10 +123,9 @@ export class KanaloaEthers {
             .getSigner(0)
             .then(
                 (acc: Signer) => {
-                    this.signer = acc;
                     return acc;
                 }
-            )
+            );
     }
 
     subscribe(elem: LitElement) {
@@ -149,4 +143,4 @@ export class KanaloaEthers {
     }
 }
 
-export const GlobalKanaloaEthers = new KanaloaEthers();
+export const KanaloaAPI = new KanaloaEthers();
