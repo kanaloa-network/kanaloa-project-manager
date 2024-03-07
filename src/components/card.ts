@@ -105,6 +105,11 @@ export class KanaCard extends LitElement {
                 a {
                     text-decoration: none;
                 }
+
+				.project-link {
+					text-decoration: none;
+					color: inherit;
+				}
             `,
             foreground(),
         ];
@@ -114,7 +119,11 @@ export class KanaCard extends LitElement {
         return html`
             <div class="title-row">
                 <h2>${this.name}</h2>
-                ${"" /*TODO: <kana-icon>settings</kana-icon>*/}
+		${"" /* TODO:
+          		<a href="PROJECT_ID_OR_SIMILAR" class="project-link">
+            			<kana-icon>settings</kana-icon>
+			</a>
+          	*/}
             </div>
             <div class="description">
                 ${this.description}
