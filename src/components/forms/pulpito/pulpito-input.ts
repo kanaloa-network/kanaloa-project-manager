@@ -1,4 +1,6 @@
-import { fallthrough, reflect } from "./utils/attribute-helpers";
+import { fallthrough, reflect, bindInitialAttrs } from "./utils/attribute-helpers";
+import { eventHandler, handlerSetup } from "./utils/event-handler";
+import { PulpitoBase, FieldValue } from "./pulpito-base";
 
 const INPUT_TYPES = [
   "button",
@@ -26,7 +28,7 @@ const INPUT_TYPES = [
 ];
 const INPUT_TAGS = [
   // NOTE: "button" exists, but is basically superseded by typed inputs
-  // Makes me wonder why even have different tags for these inputs
+  // Makes me wonder why even have different tags for these elements
   "input",
   "datalist",
   "fieldset",
@@ -55,37 +57,19 @@ const CHILDFUL_INPUT_TAGS: InputTag[] = [
   "fieldset",
 ];
 
-export type FieldValue =
-  | string
-  | string[]
-  | { [key: string]: FieldValue }
-  | null;
-
-export class PulpitoInput extends HTMLElement {
-  // This API looks like a mess
-  static formAssociated = true;
-  declare elementInternals: ElementInternals;
-
-  static get observedAttributes() {
-    return ["type", "name", "disabled", "readOnly", "invalid"];
-  }
-
-  // I am pretty sure this should be hoisted, but ChatGPT begged to differ
+export class PulpitoInput extends PulpitoBase {
   public inputElement: HTMLElement | undefined;
-  private getFormElement(): HTMLElement {
+  protected override getInnerElement(): HTMLElement {
     return this.inputElement!;
+  }
+  
+
+  static get observedAttributes(): Array<string> {
+    return [...super.observedAttributes, "type"];
   }
 
   @reflect
   accessor type: InputType = "text";
-  @reflect
-  accessor name: string | undefined;
-  @reflect @fallthrough(PulpitoInput.prototype.getFormElement)
-  accessor disabled: boolean | undefined;
-  @reflect @fallthrough(PulpitoInput.prototype.getFormElement)
-  accessor readOnly: boolean | undefined;
-  @reflect @fallthrough(PulpitoInput.prototype.getFormElement)
-  accessor invalid: boolean | undefined;
 
   set value(val: FieldValue) {
     switch (this.type) {
@@ -124,7 +108,7 @@ export class PulpitoInput extends HTMLElement {
             option.selected = true;
           }
         }
-      /* falls through */
+        break;
       case "fieldset":
         // Just throw if it's not an object
         if (
@@ -136,10 +120,12 @@ export class PulpitoInput extends HTMLElement {
             "Attempting to set fieldset with non-object",
           );
         }
+
+        // TODO: set fieldset children!
         break;
+        // TODO: default behavior
     }
   }
-  // deno-lint-ignore getter-return
   get value(): FieldValue {
     // NOTE: it would be more robust to return these values as an object
     //       that could be cast to more specific types
@@ -185,27 +171,6 @@ export class PulpitoInput extends HTMLElement {
     }
   }
 
-  constructor() {
-    super();
-    this.elementInternals = this.attachInternals();
-
-    this.attachShadow({ mode: "open" });
-  }
-
-  connectedCallback() {
-    this.shadowRoot!.innerHTML = "";
-    this.shadowRoot!.append(this.inputElement!);
-    this.dispatchEvent(new CustomEvent("input-connected", {
-      detail: this
-    }));
-  }
-
-  disconnectedCallback() {
-    this.dispatchEvent(new CustomEvent("input-disconnected", {
-      detail: this
-    }));
-  }
-
   render() {
     this.inputElement!.setAttribute("name", this.name || "");
     this.inputElement![
@@ -239,6 +204,23 @@ export class PulpitoInput extends HTMLElement {
     this.disabled = (this.disabled);
     this.readOnly = (this.readOnly);
   }
+
+  public attributeChangedCallback(
+    name: string, oldValue: string, newValue: string
+  ) {
+    if (oldValue == newValue) {
+      return;
+    }
+
+    if (name === "type") {
+      const tag = InputType2InputTag(newValue);
+      this.inputElement = document.createElement(tag);
+      if (tag === "input") {
+        this.inputElement.setAttribute("type", newValue)
+      }
+    }
+  }
+
 }
 
 function getSelectedOptions(selElem: HTMLSelectElement): HTMLOptionElement[] {

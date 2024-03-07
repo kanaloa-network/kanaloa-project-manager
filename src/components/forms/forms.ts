@@ -8,11 +8,13 @@ import { css, CSSResult } from "lit";
 import { Required as VanillaRequired } from "@lion/form-core";
 import { LionInputAmount } from '@lion/input-amount';
 import { headerStyles, interactiveComponent } from "../common-styles";
+import { CSSResultArray } from "@lion/core";
 
 const flexifyCss: CSSResult =
     css`
         :host {
             display: inline-flex;
+            position: relative;
         }
 
         :host * {
@@ -159,7 +161,7 @@ export class KanaForm extends LionForm {
                 }
                 
             `
-        ]
+        ] as unknown as CSSResultArray
     }
 }
 
@@ -168,7 +170,7 @@ export class KanaInput extends LionInput {
     static override get styles() {
         return [
             flexifyCss
-        ]
+        ] as unknown as CSSResultArray
     }
 }
 
@@ -177,7 +179,7 @@ export class KanaOptions extends LionOptions {
     static override get styles() {
         return [
             flexifyCss
-        ]
+        ] as unknown as CSSResultArray
     }
 }
 
@@ -209,7 +211,7 @@ export class KanaSelect extends LionSelect {
                }
             `,
             flexifyCss
-        ]
+        ] as unknown as CSSResultArray
     }
 }
 

@@ -114,7 +114,7 @@ export class KanaCard extends LitElement {
         return html`
             <div class="title-row">
                 <h2>${this.name}</h2>
-                <kana-icon>settings</kana-icon>
+                ${"" /*TODO: <kana-icon>settings</kana-icon>*/}
             </div>
             <div class="description">
                 ${this.description}

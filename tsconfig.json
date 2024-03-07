@@ -107,6 +107,9 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    "paths": {
+      "kanaloa-address-book.json": ["src/components/kanaloa-address-book.*.json"]
+    }
   },
   "include": [ "src/**/*" ],
   "exclude": ["node_modules", "**/*.spec.ts"]
