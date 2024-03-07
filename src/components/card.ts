@@ -119,12 +119,11 @@ export class KanaCard extends LitElement {
         return html`
             <div class="title-row">
                 <h2>${this.name}</h2>
-				${/* TODO:
-          <a href="PROJECT_ID_OR_SIMILAR" class="project-link">
-            <kana-icon>settings</kana-icon>
-				  </a>
-          */}
-
+		${"" /* TODO:
+          		<a href="PROJECT_ID_OR_SIMILAR" class="project-link">
+            			<kana-icon>settings</kana-icon>
+			</a>
+          	*/}
             </div>
             <div class="description">
                 ${this.description}
