@@ -24,9 +24,9 @@ export const colorVariables = css`
         --background-dark-color: #17102e;
     
         /* Foreground colors */
-        --foreground-color: #ffffff;
-        --foreground-light-color: #f1f1f1;
-        --foreground-dark-color: #d0d0d0;
+        --foreground-color: #fff;
+        --foreground-light-color: #fff;
+        --foreground-dark-color: #fff;
     }
 `;
 
