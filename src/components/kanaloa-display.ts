@@ -27,6 +27,7 @@ export class KanaloaDisplay extends LitElement {
                     flex-direction: column;
                     flex-grow: 1;
                     padding: 1rem;
+                    background-image: url("media/img/banner-bg.png");
                 }
 
                 kanaloa-outlet {

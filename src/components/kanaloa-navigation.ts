@@ -49,7 +49,7 @@ export default class KanaloaNavigation extends LitElement {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    margin-bottom: 1rem;
+                    margin: 2rem 0 2.5rem 0;
                 }
 
                 #logo-container img {
@@ -94,7 +94,9 @@ export default class KanaloaNavigation extends LitElement {
     render() {
         return html`
             <div id="logo-container">
-                <img src="/media/img/logo.png" alt="Kanaloa Network logo" />
+                <a href="/">
+                    <img src="/media/img/logo.png" alt="Kanaloa Network logo" />
+                </a>
             </div>
             <nav>
                 <ul>

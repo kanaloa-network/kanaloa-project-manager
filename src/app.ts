@@ -3,13 +3,13 @@ import { customElement, property } from 'lit/decorators.js';
 import { colorVariables } from './components/common-styles';
 import { routes } from './routes';
 import { Router } from '@vaadin/router';
-import { KanaloaEthers } from "./api/kanaloa-ethers";
 import './components/kanaloa-navigation';
 import './components/kanaloa-display';
 import "@material/web/icon/icon.js";
 
 import reseter from "../css/reseter.module.css";
 import materialIcons from "../css/material-icons.module.css";
+import ablation from "../media/fonts/ablation.module.css";
 
 @customElement('kanaloa-app')
 export class KanaloaApp extends LitElement {
@@ -56,6 +56,7 @@ export class KanaloaApp extends LitElement {
         }
         ${reseter}
         ${materialIcons}
+        ${ablation}
     `;
     document.head.appendChild(tag);
 })();

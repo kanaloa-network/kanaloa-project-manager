@@ -9,13 +9,6 @@ export class KanaIcon extends LitElement {
     static get styles() {
         return [
             css`
-                @font-face {
-                    font-family: 'Material Icons';
-                    font-style: normal;
-                    font-weight: 400;
-                    src: url("material-icons.ttf") format('truetype');
-                }
-                
                 :host {
                     font-family: 'Material Icons';
                     font-weight: normal;

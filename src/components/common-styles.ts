@@ -20,7 +20,7 @@ export const colorVariables = css`
 
         /* Background colors */
         --background-color: #261F47;
-        --background-light-color: #4a3b6a;
+        --background-light-color: #000;
         --background-dark-color: #17102e;
     
         /* Foreground colors */
