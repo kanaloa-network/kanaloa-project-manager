@@ -48,7 +48,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: kana-artifacts
-  
+          path: dist
+
       - name: Deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -59,7 +60,6 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
-          unzip kana-artifacts -d dist
           scp -r ./dist/* ${SERVER_USER}@${SERVER_HOST}:app/
 
       - name: Clean up SSH keys
