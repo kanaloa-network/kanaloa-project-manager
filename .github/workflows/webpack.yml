@@ -1,4 +1,4 @@
-name: NodeJS with Webpack
+name: Build and deploy with Webpack
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: |
         npm install
-        npx webpack
+        npm run build
     
     - name: Pack artifacts
       run: |
@@ -37,4 +37,32 @@ jobs:
         name: kana-artifacts
         path: |
           ./artifacts/**
+  
+  deploy:
+      needs: build  # Ensures deploy runs after build
+      runs-on: ubuntu-latest
+      environment: DEPLOYMENT
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: kana-artifacts
+  
+      - name: Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+          unzip kana-artifacts -d dist
+          scp -r ./dist/* ${SERVER_USER}@${SERVER_HOST}:app/
 
+      - name: Clean up SSH keys
+        if: always()
+        run: |
+          rm -f ~/.ssh/id_rsa
