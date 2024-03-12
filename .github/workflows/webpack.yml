@@ -15,9 +15,9 @@ jobs:
         node-version: [20.x]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -27,11 +27,11 @@ jobs:
         npx webpack
         
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: kana-artifacts
         path: |
-          ./*/dist/**
+          ./dist/**
           ./media
           ./css
           ./favicon.ico
