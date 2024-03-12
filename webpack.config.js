@@ -2,7 +2,7 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from "path";
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import TerserPlugin from 'terser-webpack-plugin';
+import webpack from "webpack";
 
 export default function (env) { 
   const mode = 
@@ -11,7 +11,7 @@ export default function (env) {
   return {
     mode: (mode === "demo") ? "development" : "production",
     entry: './src/app.ts',
-    devtool: 'inline-source-map',
+    devtool: (mode === "demo") ? 'inline-source-map' : false,
     devServer: {
       port: 8000,
       static: "./",
@@ -59,6 +59,9 @@ export default function (env) {
       new HtmlWebpackPlugin({
         template: 'index.html',
       }),
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1
+      })
     ],
   };
 }
