@@ -2,6 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import '../components/button';
 import '../components/loader';
+import '../components/ticket';
 
 
 @customElement('home-page')
@@ -22,6 +23,10 @@ export class HomePage extends LitElement {
                     font-family: Ablation;
                     font-weight: 900;
                 }
+                
+                kana-ticket {
+                    font-size: 3rem;
+                }
 
                 .floating {  
                     animation-name: floating;
@@ -38,10 +43,13 @@ export class HomePage extends LitElement {
                     to   { transform: translate(0, -0px); }    
                 }
 
-                h1 {
+                div {
                     position: absolute;
-                    font-size: 5.5rem;
                     bottom: 15%;
+                }
+
+                h1 {
+                    font-size: 5.5rem;
                 }
             `
         ]
@@ -50,7 +58,10 @@ export class HomePage extends LitElement {
     render() {
         return html`
             <img class="floating" src="media/img/home-banner.png">
-            <h1>KANALOA NETWORK</h1>
+            <div>
+                <h1>KANALOA NETWORK</h1>
+                <kana-ticket><b>50%</b> OFF!</kana-ticket>
+            </div>
         `;
     }
 }
