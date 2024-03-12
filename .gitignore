@@ -2,3 +2,4 @@ node_modules/
 rollup/
 tsconfig.tsbuildinfo
 out/
+dist/

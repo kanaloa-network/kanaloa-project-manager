@@ -26,3 +26,13 @@ jobs:
       run: |
         npm install
         npx webpack
+        
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: kana-artifacts
+        path: |
+          ./dist/**
+          ./media
+          ./css
+          ./favicon.ico
