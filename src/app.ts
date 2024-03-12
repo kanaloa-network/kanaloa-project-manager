@@ -27,6 +27,7 @@ export class KanaloaApp extends LitElement {
                 :host {
                     display: flex;
                     height: 100%;
+                    overflow: hidden;
                 }
             `
         ];
