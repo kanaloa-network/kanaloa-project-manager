@@ -192,16 +192,6 @@ export class PulpitoInput extends PulpitoBase {
     }));
   }
 
-  attributeChangedCallback<K extends keyof this>(
-    name: K, oldValue: string, newValue: string
-  ): void {
-    if (oldValue == newValue) {
-      return;
-    }
-    
-    this[name] = newValue as this[K];
-  }
-
   render() {
     this.inputElement!.setAttribute("name", this.name || "");
     this.inputElement![
