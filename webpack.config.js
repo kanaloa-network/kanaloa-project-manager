@@ -3,11 +3,12 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from "path";
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import webpack from "webpack";
+import { fileURLToPath } from 'url';
 
 export default function (env) { 
   const mode = 
     (env.mode === 'demo') ? 'demo' : 'release';
-
+  
   return {
     mode: (mode === "demo") ? "development" : "production",
     entry: './src/app.ts',
@@ -40,7 +41,7 @@ export default function (env) {
       alias: {
         "kanaloa-address-book.json": 
           path.resolve(
-            new URL('.', import.meta.url).pathname, 
+            fileURLToPath(new URL('.', import.meta.url)),
             `src/data/kanaloa-address-book.${mode}.json`
           ),
       },
