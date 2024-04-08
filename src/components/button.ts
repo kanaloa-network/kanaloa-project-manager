@@ -27,6 +27,7 @@ const commonButtonCss: CSSResult[] = [
             align-items: center;
             border-radius: 5px;
 			cursor: pointer;
+			text-align: center;
 
 			transition: all 300ms ease;
 			transition-property: background-color, color;
