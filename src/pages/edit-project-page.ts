@@ -7,7 +7,7 @@ import '../components/loader';
 import { headerStyles } from '../components/common-styles';
 import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { AbstractCardsPage } from './abstract-cards-page';
-import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
+import { KanaForm, formCssCommon, maxLengthPreprocessor } from "../components/forms/forms";
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
 import { MinMaxLength, Required } from "@lion/form-core";
 
@@ -38,6 +38,7 @@ export class EditProjectPage extends AbstractCardsPage {
 	static get styles() {
         return [
             headerStyles,
+			...formCssCommon,
             css`
                 .container {
 					display: flex;
@@ -93,16 +94,6 @@ export class EditProjectPage extends AbstractCardsPage {
 					width: 100%;
 				}
 
-				kana-input, input, kana-select {
-                    flex: 1;
-                    font-size: 1rem;
-                    position: relative;
-                }
-
-                input, select {
-                    font-family: sans;
-                }
-
 				input[type="checkbox"] {
 					zoom: 1.1;
 					transform: scale(1.1);
@@ -122,32 +113,6 @@ export class EditProjectPage extends AbstractCardsPage {
 					background-color: var(--primary-color);
 				}
 
-                input {
-                    padding: 10px;
-                    border: none;
-                    border-radius: 10px;
-                    background-color: var(--primary-color);
-                    color: var(--foreground-color);
-                    box-sizing: border-box;
-					font-size: 18px;
-                }
-
-				input::placeholder {
-					color: var(--foreground-color);
-				}
-                
-                input:focus {
-                    outline: none;
-                    box-shadow: 0 0 0 2px var(--highlighted-light-color);
-                }
-
-                .form-row {
-                    display: flex;
-                    gap: 1rem;
-                    margin: 10px 0;
-                    flex-flow: row wrap;
-                }
-
 				.form-row-column {
 					display: flex;
 					flex-direction: row;
@@ -162,31 +127,6 @@ export class EditProjectPage extends AbstractCardsPage {
 						}
 					}
 				}
-
-                select {
-                    padding: 10px;
-                    padding-right: 2rem;
-                    border: none;
-                    border-radius: 10px;
-                    background-color: var(--primary-color);
-                    color: var(--foreground-color);
-                    font-size: 1rem;
-                    appearance: none;
-                    cursor: pointer;
-                    flex: 1;
-					font-size: 18px;
-                }
-                
-                select:focus {
-                    outline: none;
-                    box-shadow: 0 0 0 2px var(--highlighted-light-color);
-                }
-                
-                kana-button-submit {
-					border-radius: 10px;
-                    min-width: fit-content;
-                    flex: 1;
-                }
 			`,
 			css`
 				.left-container {
@@ -384,37 +324,6 @@ export class EditProjectPage extends AbstractCardsPage {
 					}
 				}
 			`,
-			css`
-				.form-row lion-validation-feedback, .form-row-column lion-validation-feedback {
-                    position: absolute;
-                    background-color: var(--highlighted-light-color);
-                    color: var(--background-color);
-                    padding: 10px;
-                    border-radius: 10px;
-                    display: inline-block;
-                    max-width: 12rem;
-                    font-size: 0.8rem;
-                    line-height: 1.2;
-                    bottom: 2rem;
-                    margin-left: -3rem;
-                    width: max-content;
-                    z-index: 1
-                }
-
-                .form-row lion-validation-feedback:not([type="error"]), .form-row-column lion-validation-feedback:not([type="error"]) {
-                    display: none;
-                }
-                
-                .form-row lion-validation-feedback::before, .form-row-column lion-validation-feedback::before {
-                    content: '';
-                    position: absolute;
-                    bottom: -18px;
-                    left: 10%;
-                    margin-left: -10px;
-                    border: 10px solid transparent;
-                    border-top: 15px solid var(--highlighted-light-color);
-                }
-            `,
 			css`
 				.button-container {
 					display: flex;

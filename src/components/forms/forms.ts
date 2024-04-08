@@ -39,10 +39,11 @@ export const formCssCommon = [
             flex: 1;
             font-size: 1rem;
             position: relative;
+            font-family: Poppins;
         }
 
         input, select {
-            font-family: sans;
+            font-family: Poppins;
         }
 
         input {
@@ -78,14 +79,15 @@ export const formCssCommon = [
             padding: 10px;
             padding-right: 2rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             background-color: var(--primary-color);
             color: var(--foreground-color);
             font-size: 1rem;
             appearance: none;
             cursor: pointer;
             flex: 1;
-        }
+			font-size: 18px;
+		}
         
         select:focus {
             outline: none;
@@ -98,6 +100,11 @@ export const formCssCommon = [
             font-size: 1.2rem;
             min-height: 3rem;
         }
+
+		::placeholder {
+			color: var(--foreground-color);
+			opacity: 0.6;
+		}
     `,
     css`
         .form-row lion-validation-feedback {

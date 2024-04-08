@@ -40,6 +40,16 @@ export class KanaWalletInfo extends LitElement {
 			}
             kana-icon {
                 margin-left: 8px;
+
+				transition: all 300ms ease;
+				transition-property: opacity;
+
+				&:hover {
+					opacity: 0.8;
+
+					transition: all 300ms ease;
+					transition-property: opacity;
+				}
             }
 
             a {

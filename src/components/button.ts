@@ -9,17 +9,27 @@ const commonButtonCss: CSSResult[] = [
         :host(:hover) {
             background-color: var(--highlighted-light-color);
             color: var(--background-light-color);
+
+			transition: all 300ms ease;
+			transition-property: background-color, color;
         }
 
         :host(:active), :host([active]) {
             background-color: var(--highlighted-dark-color);
             color: var(--foreground-color);
+
+			transition: all 300ms ease;
+			transition-property: background-color, color;
         }
 
         :host {
             justify-content: center;
             align-items: center;
             border-radius: 5px;
+			cursor: pointer;
+
+			transition: all 300ms ease;
+			transition-property: background-color, color;
         }
     `,
     interactiveComponentHighlight()
