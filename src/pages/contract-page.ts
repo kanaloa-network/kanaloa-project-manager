@@ -402,7 +402,6 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
                         }
                     </h2>
                     <hr />
-                    <label>Project info</label>
                     <div class="form-row">
                         <kana-input
                             id="root-name-input"

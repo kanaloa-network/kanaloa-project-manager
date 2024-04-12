@@ -148,7 +148,8 @@ export function maxLengthPreprocessor(maxLength: number = Infinity) {
 
 export function maxNumberPreprocessor(maxNumber: bigint) {
     return (value: string) => {
-        let sanitizedValue: bigint = BigInt(value.replace(/[^0-9]/g, ''));
+		let cutValue = value.split(".")[0];
+        let sanitizedValue: bigint = BigInt(cutValue.replace(/[^0-9]/g, ''));
         if (sanitizedValue > maxNumber) {
             sanitizedValue = maxNumber;
         }

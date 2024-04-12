@@ -46,7 +46,7 @@ export class ERC721Form extends ModuleForm {
             .newContractBaseWindowlet
             .value!.formBase
             .value!.querySelector("#root-name-input")
-            .modelValue = data._name;
+            .modelValue = data.name;
 
         return data;
     }
