@@ -18,7 +18,7 @@ export class ERC721Form extends ModuleForm {
     }
 
     static get moduleSignature(): string {
-        return "123"; // TODO
+        return "0xc991fd72eab8271a09eb3e6db40963b2d53ec5a906b9363b5696eba097f72a5e";
     }
     
     static get initializerABI(): Map<string, string> {
@@ -26,7 +26,6 @@ export class ERC721Form extends ModuleForm {
             ["name", "string"],
 			["symbol", "string"], 
             ["baseTokenURI", "string"],
-			["suffixTokenURI", "string"],
             ["maxSupply", "uint256"]
         ]);
     }
@@ -53,6 +52,7 @@ export class ERC721Form extends ModuleForm {
     }
 
     formatHook(d: Record<string, any>): Record<string, any> {
+        d["maxSupply"] = Number(d["maxSupply"] / (10n ** 18n));
         return d;
     }
 
@@ -74,7 +74,7 @@ export class ERC721Form extends ModuleForm {
             return null;
         }
 
-        const model: any = form.modelValue;
+        const model: any = form.modelValue; console.log(model);
         return {
             moduleSignature: ERC721Form.moduleSignature,
             initParams: ethers.AbiCoder.defaultAbiCoder().encode(
@@ -83,8 +83,7 @@ export class ERC721Form extends ModuleForm {
                     root.name,
 					model.symbol,
                     model.baseTokenURI,
-                    model.suffixTokenURI,
-                    BigInt(model.maxSupply) * 10n ** 18n // TODO
+                    BigInt(model.maxSupply) * 10n ** 18n
                 ]
             )
         };
@@ -118,15 +117,49 @@ export class ERC721Form extends ModuleForm {
                             <kana-input
                                 label-sr-only="Symbol"
                                 placeholder="ie. USDC, BTC..."
-                                name="_symbol"
+                                name="symbol"
                                 .validators="${[
                                     new MinMaxLength({ min: 2, max: 8}),
                                     new Required()
                                 ]}"
                                 .preprocessor=${maxLengthPreprocessor(8)}
-                                class="small-input"
                             ></kana-input>
                         </span>
+                    </div>
+					<div class="form-row">
+                        <span>
+                            <label>Base Token URI &#8505;</label>
+                            <br/>
+                            <kana-input
+                                label-sr-only="Base Token URI"
+                                placeholder="ie. https://nfts.yoururl.com"
+                                name="baseTokenURI"
+                                .validators="${[
+                                    new MinMaxLength({ min: 2, max: 30}),
+                                    new Required()
+                                ]}"
+                                .preprocessor=${maxLengthPreprocessor(30)}
+                                class="big-input"
+							></kana-input>
+                        </span>
+						<span>
+                            <label>Suffix Token URI &#8505;</label>
+                            <br/>
+                            <kana-input
+                                label-sr-only="Suffix Token URI"
+                                placeholder="ie. .png, .jpeg, ..."
+                                name="suffixTokenURI"
+                                .validators="${[
+                                    new MinMaxLength({ min: 3, max: 4}),
+                                    new Required()
+                                ]}"
+                                .preprocessor=${maxLengthPreprocessor(4)}
+                            ></kana-input>
+                        </span>
+						<span>
+							Example URL for NFT "test":
+							https://nfts.yoururl.com/1.png
+						</span>
                     </div>
                     <div class="form-row">
                         <span>
@@ -134,30 +167,16 @@ export class ERC721Form extends ModuleForm {
                             <br/>
                             <kana-input-amount
                                 label-sr-only="Supply"
-                                placeholder="21000000"
-                                name="_supply"
+                                placeholder="10000"
+                                name="maxSupply"
                                 .validators="${[
                                     new MinNumber(1),
                                     new MaxNumber(MaxUint256),
                                     new Required()
                                 ]}"
                                 .preprocessor=${maxNumberPreprocessor(MaxUint256)}
-                                .modelValue=${21000000}
+                                .modelValue=${10000}
                             ></kana-input-amount>
-                        </span>
-                        <span>
-                            <label>Token decimals</label>
-                            <br/>
-                            <kana-input-stepper
-                                label-sr-only="Token decimals"
-                                value="18"
-                                name="_decimals"
-                                .validators="${[
-                                    new Required()
-                                ]}"
-                                min="0"
-                                max="32"
-                            ></kana-input-stepper>
                         </span>
                     </form>
             </kana-form>
