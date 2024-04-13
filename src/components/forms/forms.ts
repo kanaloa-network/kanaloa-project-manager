@@ -2,6 +2,7 @@ import { LionForm } from "@lion/form";
 import { LionInput } from "@lion/input";
 import { LionOption, LionOptions } from'@lion/select-rich';
 import { LionSelect } from'@lion/select';
+import { LionTooltip } from '@lion/tooltip';
 import { LionInputStepper } from "@lion/input-stepper";
 import { customElement } from "lit/decorators.js";
 import { css, CSSResult } from "lit";
@@ -75,6 +76,39 @@ export const formCssCommon = [
             flex-flow: row wrap;
         }
 
+		.form-new {
+			display: flex;
+			flex-direction: column;
+			gap: 30px;
+
+			margin-top: 30px;
+		}
+
+		.form-column-new {
+			display: flex;
+			flex-direction: row;
+			gap: 5px;
+		}
+
+		.form-row-new {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		label[slot="invoker"] {
+			cursor: pointer;
+		}
+
+		div[slot='content'] {
+			background-color: var(--highlighted-color);
+			color: var(--foreground-color);
+			padding: 6px;
+			font-size: 12px;
+			border-radius: 5px;
+			box-shadow: 0px 0px 15px rgb(0 0 0 / 15%);
+		}
+
         select {
             padding: 10px;
             padding-right: 2rem;
@@ -107,7 +141,9 @@ export const formCssCommon = [
 		}
     `,
     css`
-        .form-row lion-validation-feedback {
+        .form-row lion-validation-feedback,
+		.form-row-new lion-validation-feedback,
+		.form-column-new lion-validation-feedback {
             position: absolute;
             background-color: var(--highlighted-light-color);
             color: var(--background-color);
@@ -123,11 +159,15 @@ export const formCssCommon = [
             z-index: 1
         }
 
-        .form-row lion-validation-feedback:not([type="error"]) {
+        .form-row lion-validation-feedback:not([type="error"]),
+		.form-row-new lion-validation-feedback:not([type="error"]),
+		.form-column-new lion-validation-feedback:not([type="error"]) {
             display: none;
         }
         
-        .form-row lion-validation-feedback::before {
+        .form-row lion-validation-feedback::before,
+		.form-row-new lion-validation-feedback::before,
+		.form-row-column lion-validation-feedback::before {
             content: '';
             position: absolute;
             bottom: -18px;
@@ -235,6 +275,15 @@ export class KanaInputAmount extends LionInputAmount {
 // @ts-ignore
 @customElement("kana-input-stepper")
 export class KanaInputStepper extends LionInputStepper {
+    static override get styles() {
+        return [
+            flexifyCss
+        ]
+    }
+}
+
+@customElement("kana-tooltip")
+export class KanaTooltip extends LionTooltip {
     static override get styles() {
         return [
             flexifyCss
