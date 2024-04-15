@@ -1,11 +1,12 @@
 import { customElement } from "lit/decorators.js";
 import { ModuleForm } from "../../commons";
 import { html } from "lit";
-import { KanaForm, Required, maxLengthPreprocessor } from "../../../forms/forms";
-import { EqualsLength, Pattern } from "@lion/form-core";
-import { ethers } from "ethers";
+import { KanaForm, Required, maxNumberPreprocessor } from "../../../forms/forms";
+import { MinNumber, MaxNumber } from "@lion/form-core";
+import { MaxUint256, ethers } from "ethers";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
 import { ERC721Form } from "../../erc721-form";
+import { KanaloaAPI } from "../../../../api/kanaloa-ethers";
 
 export const ERC721_MINT_FORM_TAG = 'erc721_mint-test'; // erc721_mint is not working
 @customElement(ERC721_MINT_FORM_TAG)
@@ -66,39 +67,46 @@ export class ERC721MintForm extends ModuleForm {
             initParams: ethers.AbiCoder.defaultAbiCoder().encode(
                 Array.from(this.initializerABI.values()),
                 [ 
-                    model.toAddress,
-					1n
+                    await (await KanaloaAPI.signer)!.getAddress(),
+					model.tokenId
                 ]
             )
         };
     }
 
+	async submitHandler(ev: Event) {
+		// TODO
+	}
+
     render() {
         return html`
             <hr>
             <h3>Basic mint for ERC721</h3>
-            <kana-form>
-                <form>
+            <kana-form @submit="${this.submitHandler}">
+				<form @submit=${(ev: Event) => ev.preventDefault()}>
                     <div class="form-row">
                         <span>
-                            <label>Receiver Address</label>
+                            <label>Token ID</label>
                             <br/>
-                            <kana-input
-                                label-sr-only="Receiver Address"
-                                placeholder="0x0000000000000000000000000000000000000000"
-                                name="toAddress"
+                            <kana-input-amount
+                                label-sr-only="Token ID"
+                                placeholder="0"
+                                name="tokenId"
                                 .validators="${[
-									new EqualsLength(40),
-									new Pattern(/0x[A-Fa-f0-9]{38}/),
+									new MinNumber(0),
+                                    new MaxNumber(MaxUint256),
 									new Required()
                                 ]}"
-                                .preprocessor=${maxLengthPreprocessor(40)}
+                                .preprocessor=${maxNumberPreprocessor(MaxUint256)}
                                 ?readonly=${this.loadedRawData != null}
-                            ></kana-input>
+                            ></kana-input-amount>
                         </span>
                     </div>
+					<div class="form-row">
+						<kana-button-submit>Mint</kana-button-submit>
+					</div>
+				</form>
             </kana-form>
-
         `;
     }
     
