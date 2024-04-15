@@ -188,12 +188,16 @@ export function maxLengthPreprocessor(maxLength: number = Infinity) {
 
 export function maxNumberPreprocessor(maxNumber: bigint) {
     return (value: string) => {
-		let cutValue = value.split(".")[0];
-        let sanitizedValue: bigint = BigInt(cutValue.replace(/[^0-9]/g, ''));
-        if (sanitizedValue > maxNumber) {
-            sanitizedValue = maxNumber;
-        }
-        return sanitizedValue.toString();
+		if (value !== "") {
+			let cutValue = value.split(".")[0];
+			let sanitizedValue: bigint = BigInt(cutValue.replace(/[^0-9]/g, ''));
+			if (sanitizedValue > maxNumber) {
+				sanitizedValue = maxNumber;
+			}
+			return sanitizedValue.toString();
+		} else {
+			return "";
+		}
     }
 }
 
