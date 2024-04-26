@@ -349,8 +349,10 @@ export class ModulesWindowlet extends KanaloaWindowlet {
             <ul>
                 ${this.moduleEntry(baseModuleParams, true)}
                 ${
-                    (otherModules.length != 0) ?
-                        availableModules :
+                    (otherModules.length != 0) && (this.contractAddress !== "")
+					?
+                        availableModules
+					:
                         html`
                             <li style="margin-top: 15px; color: grey;">
                                 Hmm... there seem to be no available plugins
