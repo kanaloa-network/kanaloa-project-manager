@@ -98,12 +98,16 @@ export class ERC20MintBurnForm extends ModuleForm {
         };
     }
 
+	async submitHandler(ev: Event) {
+        
+    }
+
     render() {
         return html`
             <hr>
             <h3>Basic mint and burn for ERC20</h3>
-            <kana-form>
-                <form>
+            <kana-form @submit="${this.submitHandler}">
+                <form @submit=${(ev: Event) => ev.preventDefault()}>
                     <div class="form-row">
                         <span>
                             <label>Maximum supply</label>
