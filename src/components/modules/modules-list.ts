@@ -11,10 +11,10 @@ export const BASIC_MODULES = [
         customElement: ERC20_FORM_TAG 
     },
     {
-		name: "ERC721",
-		signature: ERC721Form.moduleSignature,
-		customElement: ERC721_FORM_TAG
-	}
+        name: "ERC721",
+        signature: ERC721Form.moduleSignature,
+        customElement: ERC721_FORM_TAG
+    }
 ] as ModuleParams[];
 export type BasicModule = (typeof BASIC_MODULES)[number]["signature"]; 
 
@@ -26,7 +26,7 @@ export const PLUGIN_MODULES: Record<BasicModule, ModuleParams[]> = {
             customElement: ERC20_MINT_BURN_FORM_TAG 
         },
     ],
-	[ERC721Form.moduleSignature]: [
+    [ERC721Form.moduleSignature]: [
         { 
             name: "Mint NFT", 
             signature: ERC721MintForm.moduleSignature,

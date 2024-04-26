@@ -24,7 +24,7 @@ export class NewProjectPage extends LitElement {
 
     static get styles() {
         return [
-			...formCssCommon,
+            ...formCssCommon,
             css`
                 :host {
                     display: flex;
@@ -46,7 +46,7 @@ export class NewProjectPage extends LitElement {
                 }
 
                 h3 {
-					opacity: 0.8;
+                    opacity: 0.8;
                     font-size: 1.5rem;
                     margin: 0;
                 }
@@ -60,14 +60,14 @@ export class NewProjectPage extends LitElement {
 
                 kana-windowlet {
                     display: flex;
-					flex-direction: column;
-					width: fit-content;
-					min-width: 500px;
+                    flex-direction: column;
+                    width: fit-content;
+                    min-width: 500px;
 
-					@media only screen and (max-width: 900px) {
-						min-width: auto;
-						width: 100%;
-					}
+                    @media only screen and (max-width: 900px) {
+                        min-width: auto;
+                        width: 100%;
+                    }
                 }
             `
         ];
@@ -75,15 +75,15 @@ export class NewProjectPage extends LitElement {
 
     async submitHandler(ev: any) {
         let form: KanaForm = ev.target;
-		let buttonText = (form.querySelector("kana-button-submit")!.children[0] as HTMLElement).innerText;
+        let buttonText = (form.querySelector("kana-button-submit")!.children[0] as HTMLElement).innerText;
 
-		if (buttonText === "Switch your Chain") {
-			KanaloaAPI.switchChain().then(() => {
-				window.location.reload();
-			});
+        if (buttonText === "Switch your Chain") {
+            KanaloaAPI.switchChain().then(() => {
+                window.location.reload();
+            });
 
-			return;
-		}
+            return;
+        }
 
         if (form.hasFeedbackFor.includes('error')) {
           const firstFormElWithError = form.formElements.find(
@@ -140,24 +140,24 @@ export class NewProjectPage extends LitElement {
     render() {
         const cost = this.calculatedCost.render({
             pending: () => {
-				return html`<span><loading-icon size="1em"><loading-icon></span>`
-			},
+                return html`<span><loading-icon size="1em"><loading-icon></span>`
+            },
             complete: (value) => {
-				const formattedValue = value / 10n ** 18n;
+                const formattedValue = value / 10n ** 18n;
 
-				return html`<span>Deploy New Project (${formattedValue} $KANA)</span>`;
-			},
+                return html`<span>Deploy New Project (${formattedValue} $KANA)</span>`;
+            },
             error: (error) => {
-				console.log(error);
+                console.log(error);
 
-				let errorMessage = "Error";
+                let errorMessage = "Error";
 
-				if ((error as Error).message.includes("could not decode result data")) {
-					errorMessage = "Switch your Chain";
-				}
+                if ((error as Error).message.includes("could not decode result data")) {
+                    errorMessage = "Switch your Chain";
+                }
 
-				return html`<span>${errorMessage}</span>`;
-			},
+                return html`<span>${errorMessage}</span>`;
+            },
         });
 
         return html`
@@ -205,7 +205,7 @@ export class NewProjectPage extends LitElement {
                         </div>
                         <div class="form-row">
                             <kana-button-submit>
-								${cost}
+                                ${cost}
                             </kana-button-submit>
                         </div>
                     </form>

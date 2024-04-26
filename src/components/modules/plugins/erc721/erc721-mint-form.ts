@@ -68,22 +68,22 @@ export class ERC721MintForm extends ModuleForm {
                 Array.from(this.initializerABI.values()),
                 [ 
                     await (await KanaloaAPI.signer)!.getAddress(),
-					model.tokenId
+                    model.tokenId
                 ]
             )
         };
     }
 
-	async submitHandler(ev: Event) {
-		// TODO
-	}
+    async submitHandler(ev: Event) {
+        // TODO
+    }
 
     render() {
         return html`
             <hr>
             <h3>Basic mint for ERC721</h3>
             <kana-form @submit="${this.submitHandler}">
-				<form @submit=${(ev: Event) => ev.preventDefault()}>
+                <form @submit=${(ev: Event) => ev.preventDefault()}>
                     <div class="form-row">
                         <span>
                             <label>Token ID</label>
@@ -93,19 +93,19 @@ export class ERC721MintForm extends ModuleForm {
                                 placeholder="0"
                                 name="tokenId"
                                 .validators="${[
-									new MinNumber(0),
+                                    new MinNumber(0),
                                     new MaxNumber(MaxUint256),
-									new Required()
+                                    new Required()
                                 ]}"
                                 .preprocessor=${maxNumberPreprocessor(MaxUint256)}
                                 ?readonly=${this.loadedRawData != null}
                             ></kana-input-amount>
                         </span>
                     </div>
-					<div class="form-row">
-						<kana-button-submit>Mint</kana-button-submit>
-					</div>
-				</form>
+                    <div class="form-row">
+                        <kana-button-submit>Mint</kana-button-submit>
+                    </div>
+                </form>
             </kana-form>
         `;
     }

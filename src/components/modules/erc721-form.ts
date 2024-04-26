@@ -13,10 +13,10 @@ export const ERC721_FORM_TAG = 'erc721-form';
 export class ERC721Form extends ModuleForm {
     static formAssociated = true;
 
-	@property({ type: String })
+    @property({ type: String })
     declare baseURI: string;
 
-	@property({ type: String })
+    @property({ type: String })
     declare suffixURI: string;
 
     constructor() {
@@ -30,7 +30,7 @@ export class ERC721Form extends ModuleForm {
     static get initializerABI(): Map<string, string> {
         return new Map([
             ["name", "string"],
-			["symbol", "string"], 
+            ["symbol", "string"], 
             ["baseTokenURI", "string"],
             ["maxSupply", "uint256"]
         ]);
@@ -54,7 +54,7 @@ export class ERC721Form extends ModuleForm {
             .value!.querySelector("#root-name-input")
             .modelValue = data.name;
 
-		this.baseURI = data.baseTokenURI;
+        this.baseURI = data.baseTokenURI;
 
         return data;
     }
@@ -89,7 +89,7 @@ export class ERC721Form extends ModuleForm {
                 Array.from(ERC721Form.initializerABI.values()),
                 [ 
                     root.name,
-					model.symbol,
+                    model.symbol,
                     model.baseTokenURI,
                     BigInt(model.maxSupply) * 10n ** 18n
                 ]
@@ -134,51 +134,51 @@ export class ERC721Form extends ModuleForm {
                             ></kana-input>
                         </span>
                     </div>
-					<div class="form-row-new">
-						<div class="form-column-new">
-							<span>
-								<kana-tooltip has-arrow>
-									<label slot="invoker">Base Token URI &#8505;</label>
-									<div slot="content">The base URI to reach your NFTs.</div>
-								</kana-tooltip>
-								<br/>
-								<kana-input
-									label-sr-only="Base Token URI"
-									placeholder="ie. https://nfts.yoururl.com"
-									name="baseTokenURI"
-									.validators="${[
-										new MinMaxLength({ min: 2, max: 50}),
-										new Pattern(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi),
-										new Required()
-									]}"
-									.preprocessor=${maxLengthPreprocessor(50)}
-									.value="${this.baseURI}"
-									@input="${(event: InputEvent) => this.baseURI = (event.target as HTMLInputElement).value}"
-								></kana-input>
-							</span>
-							<span>
-								<kana-tooltip has-arrow>
-									<label slot="invoker">Suffix Token URI &#8505;</label>
-									<div slot="content">The suffix for NFTs meaning the filetype.</div>
-								</kana-tooltip>
-								<br/>
-								<kana-input
-									label-sr-only="Suffix Token URI"
-									placeholder="ie. png, jpeg, ..."
-									name="suffixTokenURI"
-									.validators="${[
-										new MinMaxLength({ min: 3, max: 4}),
-										new Required()
-									]}"
-									.preprocessor=${maxLengthPreprocessor(4)}
-									.value="${this.suffixURI}"
-									@input="${(event: InputEvent) => this.suffixURI = (event.target as HTMLInputElement).value}"
-								></kana-input>
-							</span>
-						</div>
-						<span>
-							Full URI: <b>${(this.baseURI !== undefined && this.baseURI !== "") ? this.baseURI : "https://nfts.yoururl.com"}/YOUR_NFT.${(this.suffixURI !== undefined && this.suffixURI !== "") ? this.suffixURI : "png"}</b>
-						</span>
+                    <div class="form-row-new">
+                        <div class="form-column-new">
+                            <span>
+                                <kana-tooltip has-arrow>
+                                    <label slot="invoker">Base Token URI &#8505;</label>
+                                    <div slot="content">The base URI to reach your NFTs.</div>
+                                </kana-tooltip>
+                                <br/>
+                                <kana-input
+                                    label-sr-only="Base Token URI"
+                                    placeholder="ie. https://nfts.yoururl.com"
+                                    name="baseTokenURI"
+                                    .validators="${[
+                                        new MinMaxLength({ min: 2, max: 50}),
+                                        new Pattern(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi),
+                                        new Required()
+                                    ]}"
+                                    .preprocessor=${maxLengthPreprocessor(50)}
+                                    .value="${this.baseURI}"
+                                    @input="${(event: InputEvent) => this.baseURI = (event.target as HTMLInputElement).value}"
+                                ></kana-input>
+                            </span>
+                            <span>
+                                <kana-tooltip has-arrow>
+                                    <label slot="invoker">Suffix Token URI &#8505;</label>
+                                    <div slot="content">The suffix for NFTs meaning the filetype.</div>
+                                </kana-tooltip>
+                                <br/>
+                                <kana-input
+                                    label-sr-only="Suffix Token URI"
+                                    placeholder="ie. png, jpeg, ..."
+                                    name="suffixTokenURI"
+                                    .validators="${[
+                                        new MinMaxLength({ min: 3, max: 4}),
+                                        new Required()
+                                    ]}"
+                                    .preprocessor=${maxLengthPreprocessor(4)}
+                                    .value="${this.suffixURI}"
+                                    @input="${(event: InputEvent) => this.suffixURI = (event.target as HTMLInputElement).value}"
+                                ></kana-input>
+                            </span>
+                        </div>
+                        <span>
+                            Full URI: <b>${(this.baseURI !== undefined && this.baseURI !== "") ? this.baseURI : "https://nfts.yoururl.com"}/YOUR_NFT.${(this.suffixURI !== undefined && this.suffixURI !== "") ? this.suffixURI : "png"}</b>
+                        </span>
                     </div>
                     <div class="form-row-new">
                         <span>

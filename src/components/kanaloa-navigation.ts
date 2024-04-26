@@ -76,15 +76,15 @@ export default class KanaloaNavigation extends LitElement {
                     text-decoration: none;
                     color: inherit;
 
-					transition: all 300ms ease;
-					transition-property: opacity;
+                    transition: all 300ms ease;
+                    transition-property: opacity;
 
-					&:hover {
-						transition: all 300ms ease;
-						transition-property: opacity;
+                    &:hover {
+                        transition: all 300ms ease;
+                        transition-property: opacity;
 
-						opacity: 0.8;
-					}
+                        opacity: 0.8;
+                    }
                 }
     
                 kana-icon {

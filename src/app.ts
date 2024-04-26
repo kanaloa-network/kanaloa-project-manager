@@ -54,7 +54,7 @@ export class KanaloaApp extends LitElement {
     tag.innerText = `
         html, body {
             height: 100%;
-			font-family: Poppins;
+            font-family: Poppins;
         }
         ${reseter}
         ${materialIcons}

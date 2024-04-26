@@ -76,38 +76,38 @@ export const formCssCommon = [
             flex-flow: row wrap;
         }
 
-		.form-new {
-			display: flex;
-			flex-direction: column;
-			gap: 30px;
+        .form-new {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
 
-			margin-top: 30px;
-		}
+            margin-top: 30px;
+        }
 
-		.form-column-new {
-			display: flex;
-			flex-direction: row;
-			gap: 5px;
-		}
+        .form-column-new {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+        }
 
-		.form-row-new {
-			display: flex;
-			flex-direction: column;
-			gap: 5px;
-		}
+        .form-row-new {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-		label[slot="invoker"] {
-			cursor: pointer;
-		}
+        label[slot="invoker"] {
+            cursor: pointer;
+        }
 
-		div[slot='content'] {
-			background-color: var(--highlighted-color);
-			color: var(--foreground-color);
-			padding: 6px;
-			font-size: 12px;
-			border-radius: 5px;
-			box-shadow: 0px 0px 15px rgb(0 0 0 / 15%);
-		}
+        div[slot='content'] {
+            background-color: var(--highlighted-color);
+            color: var(--foreground-color);
+            padding: 6px;
+            font-size: 12px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px rgb(0 0 0 / 15%);
+        }
 
         select {
             padding: 10px;
@@ -120,8 +120,8 @@ export const formCssCommon = [
             appearance: none;
             cursor: pointer;
             flex: 1;
-			font-size: 18px;
-		}
+            font-size: 18px;
+        }
         
         select:focus {
             outline: none;
@@ -135,15 +135,15 @@ export const formCssCommon = [
             min-height: 3rem;
         }
 
-		::placeholder {
-			color: var(--foreground-color);
-			opacity: 0.6;
-		}
+        ::placeholder {
+            color: var(--foreground-color);
+            opacity: 0.6;
+        }
     `,
     css`
         .form-row lion-validation-feedback,
-		.form-row-new lion-validation-feedback,
-		.form-column-new lion-validation-feedback {
+        .form-row-new lion-validation-feedback,
+        .form-column-new lion-validation-feedback {
             position: absolute;
             background-color: var(--highlighted-light-color);
             color: var(--background-color);
@@ -160,14 +160,14 @@ export const formCssCommon = [
         }
 
         .form-row lion-validation-feedback:not([type="error"]),
-		.form-row-new lion-validation-feedback:not([type="error"]),
-		.form-column-new lion-validation-feedback:not([type="error"]) {
+        .form-row-new lion-validation-feedback:not([type="error"]),
+        .form-column-new lion-validation-feedback:not([type="error"]) {
             display: none;
         }
         
         .form-row lion-validation-feedback::before,
-		.form-row-new lion-validation-feedback::before,
-		.form-row-column lion-validation-feedback::before {
+        .form-row-new lion-validation-feedback::before,
+        .form-row-column lion-validation-feedback::before {
             content: '';
             position: absolute;
             bottom: -18px;
@@ -188,16 +188,16 @@ export function maxLengthPreprocessor(maxLength: number = Infinity) {
 
 export function maxNumberPreprocessor(maxNumber: bigint) {
     return (value: string) => {
-		if (value !== "") {
-			let cutValue = value.split(".")[0];
-			let sanitizedValue: bigint = BigInt(cutValue.replace(/[^0-9]/g, ''));
-			if (sanitizedValue > maxNumber) {
-				sanitizedValue = maxNumber;
-			}
-			return sanitizedValue.toString();
-		} else {
-			return "";
-		}
+        if (value !== "") {
+            let cutValue = value.split(".")[0];
+            let sanitizedValue: bigint = BigInt(cutValue.replace(/[^0-9]/g, ''));
+            if (sanitizedValue > maxNumber) {
+                sanitizedValue = maxNumber;
+            }
+            return sanitizedValue.toString();
+        } else {
+            return "";
+        }
     }
 }
 
