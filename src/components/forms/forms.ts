@@ -84,16 +84,22 @@ export const formCssCommon = [
             margin-top: 30px;
         }
 
+		.form-element-new {
+			display: flex;
+            flex-direction: column;
+            gap: 3px;
+		}
+
         .form-column-new {
             display: flex;
-            flex-direction: row;
-            gap: 5px;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .form-row-new {
             display: flex;
-            flex-direction: column;
-            gap: 5px;
+            flex-direction: row;
+            gap: 10px;
         }
 
         label[slot="invoker"] {
@@ -142,8 +148,7 @@ export const formCssCommon = [
     `,
     css`
         .form-row lion-validation-feedback,
-        .form-row-new lion-validation-feedback,
-        .form-column-new lion-validation-feedback {
+        .form-element-new lion-validation-feedback {
             position: absolute;
             background-color: var(--highlighted-light-color);
             color: var(--background-color);
@@ -160,14 +165,12 @@ export const formCssCommon = [
         }
 
         .form-row lion-validation-feedback:not([type="error"]),
-        .form-row-new lion-validation-feedback:not([type="error"]),
-        .form-column-new lion-validation-feedback:not([type="error"]) {
+        .form-element-new lion-validation-feedback:not([type="error"]) {
             display: none;
         }
         
         .form-row lion-validation-feedback::before,
-        .form-row-new lion-validation-feedback::before,
-        .form-row-column lion-validation-feedback::before {
+        .form-element-new lion-validation-feedback::before {
             content: '';
             position: absolute;
             bottom: -18px;

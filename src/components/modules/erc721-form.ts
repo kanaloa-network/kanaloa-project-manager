@@ -97,20 +97,6 @@ export class ERC721Form extends ModuleForm {
         };
     }
 
-    asUpstream(local: ethers.BytesLike): boolean {
-        // Due to how ERC721 is initialized, it requires an address parameter
-        // that is not returned with peekState. We will truncate the last 32
-        // bytes before comparing
-        
-        // A bit of an explanation on the slicing: 258 is the position at which
-        // the address begins ("0x" + 256 chars). It continues for 64 bytes,
-        // and then it's all the same. The loadedRawData always returns the
-        // zeroth address.
-        const relocal = 
-            local.slice(0, 258) + ethers.ZeroHash.slice(2) + local.slice(322);
-        return relocal == this.loadedRawData;
-    }
-
     render() {
         return html`
             <h2>ERC721 module</h2>
@@ -118,30 +104,26 @@ export class ERC721Form extends ModuleForm {
             <h3>The non-fungible token (NFT) standard</h3>
             <kana-form>
                 <form class="form-new">
-                    <div class="form-row-new">
-                        <span>
-                            <label>Symbol</label>
-                            <br/>
-                            <kana-input
-                                label-sr-only="Symbol"
-                                placeholder="ie. USDC, BTC..."
-                                name="symbol"
-                                .validators="${[
-                                    new MinMaxLength({ min: 2, max: 8}),
-                                    new Required()
-                                ]}"
-                                .preprocessor=${maxLengthPreprocessor(8)}
-                            ></kana-input>
-                        </span>
+                    <div class="form-element-new">
+						<label>Symbol</label>
+						<kana-input
+							label-sr-only="Symbol"
+							placeholder="ie. USDC, BTC..."
+							name="symbol"
+							.validators="${[
+								new MinMaxLength({ min: 2, max: 8}),
+								new Required()
+							]}"
+							.preprocessor=${maxLengthPreprocessor(8)}
+						></kana-input>
                     </div>
-                    <div class="form-row-new">
-                        <div class="form-column-new">
-                            <span>
+                    <div class="form-column-new">
+                        <div class="form-row-new">
+                            <div class="form-element-new">
                                 <kana-tooltip has-arrow>
                                     <label slot="invoker">Base Token URI &#8505;</label>
                                     <div slot="content">The base URI to reach your NFTs.</div>
                                 </kana-tooltip>
-                                <br/>
                                 <kana-input
                                     label-sr-only="Base Token URI"
                                     placeholder="ie. https://nfts.yoururl.com"
@@ -155,49 +137,47 @@ export class ERC721Form extends ModuleForm {
                                     .value="${this.baseURI}"
                                     @input="${(event: InputEvent) => this.baseURI = (event.target as HTMLInputElement).value}"
                                 ></kana-input>
-                            </span>
-                            <span>
+                            </div>
+                            <div class="form-element-new">
                                 <kana-tooltip has-arrow>
                                     <label slot="invoker">Suffix Token URI &#8505;</label>
                                     <div slot="content">The suffix for NFTs meaning the filetype.</div>
                                 </kana-tooltip>
-                                <br/>
                                 <kana-input
                                     label-sr-only="Suffix Token URI"
-                                    placeholder="ie. png, jpeg, ..."
+                                    placeholder="ie. .png, .jpeg, ..."
                                     name="suffixTokenURI"
                                     .validators="${[
-                                        new MinMaxLength({ min: 3, max: 4}),
+                                        new MinMaxLength({ min: 4, max: 5}),
+                                        new Pattern(/^\./),
                                         new Required()
                                     ]}"
-                                    .preprocessor=${maxLengthPreprocessor(4)}
+                                    .preprocessor=${maxLengthPreprocessor(5)}
                                     .value="${this.suffixURI}"
                                     @input="${(event: InputEvent) => this.suffixURI = (event.target as HTMLInputElement).value}"
                                 ></kana-input>
-                            </span>
+                            </div>
                         </div>
                         <span>
-                            Full URI: <b>${(this.baseURI !== undefined && this.baseURI !== "") ? this.baseURI : "https://nfts.yoururl.com"}/YOUR_NFT.${(this.suffixURI !== undefined && this.suffixURI !== "") ? this.suffixURI : "png"}</b>
+                            Full URI: <b>${(this.baseURI !== undefined && this.baseURI !== "") ? this.baseURI : "https://nfts.yoururl.com"}/YOUR_NFT${(this.suffixURI !== undefined && this.suffixURI !== "") ? this.suffixURI : ".png"}</b>
                         </span>
                     </div>
-                    <div class="form-row-new">
-                        <span>
-                            <label>Supply</label>
-                            <br/>
-                            <kana-input-amount
-                                label-sr-only="Supply"
-                                placeholder="10000"
-                                name="maxSupply"
-                                .validators="${[
-                                    new MinNumber(1),
-                                    new MaxNumber(MaxUint256),
-                                    new Required()
-                                ]}"
-                                .preprocessor=${maxNumberPreprocessor(MaxUint256)}
-                                .modelValue=${10000}
-                            ></kana-input-amount>
-                        </span>
-                    </form>
+                    <div class="form-element-new">
+						<label>Supply</label>
+						<kana-input-amount
+							label-sr-only="Supply"
+							placeholder="10000"
+							name="maxSupply"
+							.validators="${[
+								new MinNumber(1),
+								new MaxNumber(MaxUint256),
+								new Required()
+							]}"
+							.preprocessor=${maxNumberPreprocessor(MaxUint256)}
+							.modelValue=${10000}
+						></kana-input-amount>
+					</div>
+                </form>
             </kana-form>
         `;
     }

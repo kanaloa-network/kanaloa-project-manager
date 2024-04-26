@@ -138,7 +138,7 @@ export class NewProjectPage extends LitElement {
     );
 
     render() {
-        const cost = this.calculatedCost.render({
+        const submitButtonContent = this.calculatedCost.render({
             pending: () => {
                 return html`<span><loading-icon size="1em"><loading-icon></span>`
             },
@@ -205,7 +205,7 @@ export class NewProjectPage extends LitElement {
                         </div>
                         <div class="form-row">
                             <kana-button-submit>
-                                ${cost}
+                                ${submitButtonContent}
                             </kana-button-submit>
                         </div>
                     </form>
