@@ -105,17 +105,17 @@ export class ERC721Form extends ModuleForm {
             <kana-form>
                 <form class="form-new">
                     <div class="form-element-new">
-						<label>Symbol</label>
-						<kana-input
-							label-sr-only="Symbol"
-							placeholder="ie. USDC, BTC..."
-							name="symbol"
-							.validators="${[
-								new MinMaxLength({ min: 2, max: 8}),
-								new Required()
-							]}"
-							.preprocessor=${maxLengthPreprocessor(8)}
-						></kana-input>
+                        <label>Symbol</label>
+                        <kana-input
+                            label-sr-only="Symbol"
+                            placeholder="ie. USDC, BTC..."
+                            name="symbol"
+                            .validators="${[
+                                new MinMaxLength({ min: 2, max: 8}),
+                                new Required()
+                            ]}"
+                            .preprocessor=${maxLengthPreprocessor(8)}
+                        ></kana-input>
                     </div>
                     <div class="form-column-new">
                         <div class="form-row-new">
@@ -163,20 +163,20 @@ export class ERC721Form extends ModuleForm {
                         </span>
                     </div>
                     <div class="form-element-new">
-						<label>Supply</label>
-						<kana-input-amount
-							label-sr-only="Supply"
-							placeholder="10000"
-							name="maxSupply"
-							.validators="${[
-								new MinNumber(1),
-								new MaxNumber(MaxUint256),
-								new Required()
-							]}"
-							.preprocessor=${maxNumberPreprocessor(MaxUint256)}
-							.modelValue=${10000}
-						></kana-input-amount>
-					</div>
+                        <label>Supply</label>
+                        <kana-input-amount
+                            label-sr-only="Supply"
+                            placeholder="10000"
+                            name="maxSupply"
+                            .validators="${[
+                                new MinNumber(1),
+                                new MaxNumber(MaxUint256),
+                                new Required()
+                            ]}"
+                            .preprocessor=${maxNumberPreprocessor(MaxUint256)}
+                            .modelValue=${10000}
+                        ></kana-input-amount>
+                    </div>
                 </form>
             </kana-form>
         `;

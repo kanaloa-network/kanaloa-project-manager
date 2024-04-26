@@ -84,11 +84,11 @@ export const formCssCommon = [
             margin-top: 30px;
         }
 
-		.form-element-new {
-			display: flex;
+        .form-element-new {
+            display: flex;
             flex-direction: column;
             gap: 3px;
-		}
+        }
 
         .form-column-new {
             display: flex;
