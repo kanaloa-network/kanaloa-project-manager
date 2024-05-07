@@ -349,7 +349,7 @@ export class ModulesWindowlet extends KanaloaWindowlet {
             <ul>
                 ${this.moduleEntry(baseModuleParams, true)}
                 ${
-                    (otherModules.length != 0) && (this.contractAddress !== "")
+                    (otherModules.length != 0)
                     ?
                         availableModules
                     :

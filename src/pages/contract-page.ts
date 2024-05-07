@@ -240,7 +240,11 @@ export class ContractPage extends LitElement {
     }
 
     render() {
+        if (this.modulesList.value != null) {
+            this.modulesList.value.baseModule = this.selectedBaseModule;            
+        }
         const forms = this.modulesList.value?.getSelectedModules().values();
+        
         return html`
             ${
                 when(
