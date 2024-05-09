@@ -7,6 +7,7 @@ import { MaxUint256, ethers } from "ethers";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
 import { ERC721Form } from "../../erc721-form";
 import { KanaloaAPI } from "../../../../api/kanaloa-ethers";
+import { ContractPage } from "src/pages/contract-page";
 
 export const ERC721_MINT_FORM_TAG = 'erc721_mint-test'; // erc721_mint is not working
 @customElement(ERC721_MINT_FORM_TAG)
@@ -26,10 +27,7 @@ export class ERC721MintForm extends ModuleForm {
     }
     
     get initializerABI(): Map<string, string> {
-        return new Map([
-            ["to", "address"],
-            ["tokenId", "uint256"],
-        ]);
+        return new Map();
     }
         
     public erc721Form: ERC721Form | null = null; 
@@ -37,8 +35,8 @@ export class ERC721MintForm extends ModuleForm {
         this.erc721Form = ref as ERC721Form;
     }
 
-    formatHook(d: Record<string, any>): Record<string, any> {
-        return d;
+    load(): Record<string, any> {
+        return [];
     }
     
     async compileModuleParameters(root: any): Promise<ModuleParameters | null> {
@@ -61,24 +59,26 @@ export class ERC721MintForm extends ModuleForm {
             return null;
         }
 
-        const model: any = form.modelValue;
         return {
             moduleSignature: this.moduleSignature,
             initParams: ethers.AbiCoder.defaultAbiCoder().encode(
                 Array.from(this.initializerABI.values()),
-                [ 
-                    await (await KanaloaAPI.signer)!.getAddress(),
-                    model.tokenId
-                ]
+                []
             )
         };
     }
 
     async submitHandler(ev: Event) {
-        // TODO
+        // no-op
+        return;
     }
 
     render() {
+        const isInstalled = 
+            ((this.getRootNode() as ShadowRoot).host as ContractPage)
+                .modulesList
+                .value?.onchainModules[this.moduleSignature] != null;
+                
         return html`
             <hr>
             <h3>Basic mint for ERC721</h3>
@@ -95,19 +95,33 @@ export class ERC721MintForm extends ModuleForm {
                                 .validators="${[
                                     new MinNumber(0),
                                     new MaxNumber(MaxUint256),
-                                    new Required()
+                                    // new Required() // it's not really required, at least in the usual sense
                                 ]}"
                                 .preprocessor=${maxNumberPreprocessor(MaxUint256)}
-                                ?readonly=${this.loadedRawData != null}
+                                ?readonly=${!isInstalled}
                             ></kana-input-amount>
                         </span>
                     </div>
                     <div class="form-row">
-                        <kana-button-submit>Mint</kana-button-submit>
+                        <kana-button-submit ?disabled=${!isInstalled}>
+                            Mint
+                        </kana-button-submit>
                     </div>
                 </form>
             </kana-form>
+            ${
+                (!isInstalled) ? 
+                    html`
+                        <div>
+                            <small>
+                                This module will be installed. 
+                                Related functionality will be enabled
+                                after the installation is completed.
+                            </small>
+                        </div>
+                    ` : 
+                    ""
+            }
         `;
     }
-    
 }
