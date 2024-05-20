@@ -3,7 +3,7 @@ import { ModuleForm } from "../../commons";
 import { html } from "lit";
 import { KanaForm, Required, maxNumberPreprocessor } from "../../../forms/forms";
 import { MinNumber, MaxNumber } from "@lion/form-core";
-import { MaxUint256, ethers } from "ethers";
+import { Contract, MaxUint256, ethers } from "ethers";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
 import { ERC721Form } from "../../erc721-form";
 import { KanaloaAPI } from "../../../../api/kanaloa-ethers";
@@ -38,12 +38,12 @@ export class ERC721MintForm extends ModuleForm {
     load(): Record<string, any> {
         return [];
     }
-    
-    async compileModuleParameters(root: any): Promise<ModuleParameters | null> {
+
+	protected isValid(): boolean {
         const form = this.kanaForm;
 
         if (form == null) {
-            return null;
+            return false;
         }
 
         form.formElements.forEach(
@@ -56,9 +56,24 @@ export class ERC721MintForm extends ModuleForm {
                     (el: any) => el.hasFeedbackFor.includes('error'),
             );
             firstFormElWithError.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    async compileModuleParameters(root: any): Promise<ModuleParameters | null> {
+        const form = this.kanaForm;
+
+        if (form == null) {
             return null;
         }
 
+        if (this.isValid() == false) {
+            return null;
+        }
+
+        const model: any = form.modelValue;
         return {
             moduleSignature: this.moduleSignature,
             initParams: ethers.AbiCoder.defaultAbiCoder().encode(
@@ -68,9 +83,35 @@ export class ERC721MintForm extends ModuleForm {
         };
     }
 
-    async submitHandler(ev: Event) {
-        // no-op
-        return;
+	async actionHandler(ev: Event) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        if (this.isValid() == false) {
+            return;
+        }
+
+        const signer = await KanaloaAPI.signer;
+        const contract = 
+            new Contract(
+                ((this.getRootNode() as ShadowRoot).host as ContractPage).contract!,
+                ["function mint(address to, uint256 tokenId)"],
+                signer
+            );
+        const params = [];
+        const tokenId = (this.modelValue as any)["tokenId"];
+
+        if (tokenId === null || tokenId === "") {
+            // TODO: give some warning about this being required
+            return;
+        } 
+
+		params.push(await signer?.getAddress())
+		params.push(tokenId);
+        
+        // TODO: block interaction on submit
+        // TODO: unlock and clear on return
+        await contract["mint"](...params);
     }
 
     render() {
@@ -82,7 +123,7 @@ export class ERC721MintForm extends ModuleForm {
         return html`
             <hr>
             <h3>Basic mint for ERC721</h3>
-            <kana-form @submit="${this.submitHandler}">
+            <kana-form @submit="${(ev: Event) => ev.preventDefault()}">
                 <form @submit=${(ev: Event) => ev.preventDefault()}>
                     <div class="form-row">
                         <span>
@@ -103,7 +144,7 @@ export class ERC721MintForm extends ModuleForm {
                         </span>
                     </div>
                     <div class="form-row">
-                        <kana-button-submit ?disabled=${!isInstalled}>
+                        <kana-button-submit @click=${this.actionHandler} ?disabled=${!isInstalled}>
                             Mint
                         </kana-button-submit>
                     </div>
