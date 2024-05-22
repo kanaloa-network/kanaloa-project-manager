@@ -2,12 +2,28 @@ import { customElement } from "lit/decorators.js";
 import { ModuleForm } from "../../commons";
 import { html } from "lit";
 import { KanaForm, Required, maxNumberPreprocessor } from "../../../forms/forms";
-import { MinNumber, MaxNumber } from "@lion/form-core";
+import { MinNumber, MaxNumber, Validator } from "@lion/form-core";
 import { Contract, MaxUint256, ethers } from "ethers";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
 import { ERC721Form } from "../../erc721-form";
 import { KanaloaAPI } from "../../../../api/kanaloa-ethers";
 import { ContractPage } from "src/pages/contract-page";
+
+class NotMintedYet extends Validator {
+    static get validatorName() {
+        return 'NotMintedYet';
+    }
+  
+    execute(modelValue: any) {
+        try {
+			// check if modelValue.tokenId is not minted yet
+
+            return true;
+        } catch (err) {
+            return true;
+        }
+    }
+}
 
 export const ERC721_MINT_FORM_TAG = 'erc721_mint-test'; // erc721_mint is not working
 @customElement(ERC721_MINT_FORM_TAG)
@@ -136,6 +152,9 @@ export class ERC721MintForm extends ModuleForm {
                                 .validators="${[
                                     new MinNumber(0),
                                     new MaxNumber(MaxUint256),
+									new NotMintedYet({ 
+                                        getMessage: () => "This token ID is already minted, please try to mint another ID." 
+                                    })
                                     // new Required() // it's not really required, at least in the usual sense
                                 ]}"
                                 .preprocessor=${maxNumberPreprocessor(MaxUint256)}
