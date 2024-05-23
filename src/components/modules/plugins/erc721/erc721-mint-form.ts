@@ -16,9 +16,9 @@ class NotMintedYet extends Validator {
   
     execute(modelValue: any) {
         try {
-			// check if modelValue.tokenId is not minted yet
+            // check if modelValue.tokenId is not minted yet
 
-            return true;
+            return false;
         } catch (err) {
             return true;
         }
@@ -55,7 +55,7 @@ export class ERC721MintForm extends ModuleForm {
         return [];
     }
 
-	protected isValid(): boolean {
+    protected isValid(): boolean {
         const form = this.kanaForm;
 
         if (form == null) {
@@ -99,7 +99,7 @@ export class ERC721MintForm extends ModuleForm {
         };
     }
 
-	async actionHandler(ev: Event) {
+    async actionHandler(ev: Event) {
         ev.preventDefault();
         ev.stopPropagation();
 
@@ -122,8 +122,8 @@ export class ERC721MintForm extends ModuleForm {
             return;
         } 
 
-		params.push(await signer?.getAddress())
-		params.push(tokenId);
+        params.push(await signer?.getAddress())
+        params.push(tokenId);
         
         // TODO: block interaction on submit
         // TODO: unlock and clear on return
@@ -152,7 +152,7 @@ export class ERC721MintForm extends ModuleForm {
                                 .validators="${[
                                     new MinNumber(0),
                                     new MaxNumber(MaxUint256),
-									new NotMintedYet({ 
+                                    new NotMintedYet({ 
                                         getMessage: () => "This token ID is already minted, please try to mint another ID." 
                                     })
                                     // new Required() // it's not really required, at least in the usual sense

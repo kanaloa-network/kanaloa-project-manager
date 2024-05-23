@@ -125,7 +125,7 @@ export class ERC20MintBurnForm extends ModuleForm {
         };
     }
 
-	async actionHandler(ev: Event) {
+    async actionHandler(ev: Event) {
         ev.preventDefault();
         ev.stopPropagation();
 
