@@ -28,7 +28,7 @@ export const PLUGIN_MODULES: Record<BasicModule, ModuleParams[]> = {
         },
     ],
     [ERC721Form.moduleSignature]: [
-        /* { 
+        /* { // TODO-Z: uncomment these lines
             name: "Mint NFT", 
             signature: ERC721MintForm.moduleSignature,
             customElement: ERC721_MINT_FORM_TAG 
