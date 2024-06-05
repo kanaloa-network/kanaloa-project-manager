@@ -16,8 +16,9 @@ const enum Status {
     newEntry = "#00d3d5", // blue
 }
 
-interface DataObject {
-    status: Status|null;
+interface UriDataObject {
+	objectId: number;
+    status: Status;
     tokenId: number|null;
     uri: string|null;
 }
@@ -27,8 +28,8 @@ export const ERC721_OVERRIDE_URI_FORM_TAG = 'erc721_override_uri-test';
 export class ERC721OverrideURIForm extends ModuleForm {
     static formAssociated = true;
 
-    @property({ type: Array<DataObject> })
-    declare data: Array<DataObject>;
+    @property({ type: Array<UriDataObject> })
+    declare uriDataObjectList: Array<UriDataObject>;
 
     static override get styles() {
         return [
@@ -44,27 +45,42 @@ export class ERC721OverrideURIForm extends ModuleForm {
                     overflow-y: auto;
                 }
 
-				table th {
+				table {
+					width: 100%;
+					border-collapse: collapse;
+				}
+
+				table, td {
+                    border: 1px solid var(--primary-color);
+                }
+
+				th {
 					position: sticky;
 					top: 0;
 					z-index: 1;
-					background-color: var(--primary-color);
+
+					background-color: var(--background-color);
 					color: var(--foreground-color);
                     border: 1px solid var(--foreground-color);
 				}
-                
-                table, th, td {
-                    border: 1px solid var(--primary-color);
-                    border-collapse: collapse;
-                }
+
+				th:first-child {
+					border-left: none;
+				}
+
+				th:last-child {
+					border-right: none;
+				}
 
 				th, td {
 					width: 150px;
-					padding: 10px;
+					padding: 5px;
 				}
 
 				td > input {
 					width: 100%;
+					padding: 3px;
+					font-size: 14px;
 				}
 
 				.wide-column {
@@ -75,6 +91,11 @@ export class ERC721OverrideURIForm extends ModuleForm {
 				.small-column {
 					width: 50px;
 					text-align: center;
+				}
+
+				.uri-text {
+					padding-left: 3px;
+					font-size: 14px;
 				}
 
                 .circle {
@@ -107,13 +128,15 @@ export class ERC721OverrideURIForm extends ModuleForm {
         super();
 
         // TODO: get data from blockchain
-        this.data = [
+        this.uriDataObjectList = [
             {
+				objectId: 1,
                 status: Status.oldEntry,
                 tokenId: 1,
                 uri: "https://hello.com"
             },
             {
+				objectId: 2,
                 status: Status.oldEntry,
                 tokenId: 2,
                 uri: "http://super.duper"
@@ -198,27 +221,52 @@ export class ERC721OverrideURIForm extends ModuleForm {
 		// TODO: get all updates from the blockchain and set this.data like in the constructor
     }
 
-	getGreenElements() {
-		return this.data.filter(element => element.status !== Status.oldEntry);
+	// ---- URI - GETTER ----
+
+	getNonGreenUriObjects() {
+		return this.uriDataObjectList.filter(uriObject => uriObject.status !== Status.oldEntry);
 	}
 
-    addElement(data: DataObject) {
-        this.data = [...this.data, data];
+	getFormattedUri(uri: string|null) {
+		if (uri !== null) {
+			let maxLength = 30;
+
+			return uri.length > maxLength ? uri.slice(0, maxLength - 3) + "..." : uri;
+		}
+	}
+
+	getStatusString(status: Status) {
+		switch (status) {
+			case Status.oldEntry:
+				return "This is an existing entry.";
+			case Status.changedEntry:
+				return "This entry will be changed on \"Update\".";
+			case Status.deletedEntry:
+				return "This entry will be deleted on \"Update\"";
+			case Status.newEntry:
+				return "This entry will be added on \"Update\"";
+		}
+	}
+
+	// ---- URI - INTERACTIONS ----
+
+    addUriObject(uriObject: UriDataObject) {
+        this.uriDataObjectList = [...this.uriDataObjectList, uriObject];
     }
 
 	updateTokenId(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const newValue = parseInt(input.value);
 
-		const allIds = this.data.map(element =>  element.tokenId);
+		const allIds = this.uriDataObjectList.map(uriObject =>  uriObject.tokenId);
 
 		if (!allIds.includes(newValue)) {
-			this.data = this.data.map(element => {
-				if (element.tokenId === null) {
-					element.tokenId = newValue;
+			this.uriDataObjectList = this.uriDataObjectList.map(uriObject => {
+				if (uriObject.tokenId === null) {
+					uriObject.tokenId = newValue;
 				}
 	
-				return element;
+				return uriObject;
 			});
 		} else {
 			input.value = "";
@@ -231,31 +279,31 @@ export class ERC721OverrideURIForm extends ModuleForm {
 			const input = event.target as HTMLInputElement;
 			const newValue = input.value;
 
-			this.data = this.data.map(element => {
-				if (element.tokenId === tokenId) {
-					element.uri = newValue;
-					element.status = Status.changedEntry;
+			this.uriDataObjectList = this.uriDataObjectList.map(uriObject => {
+				if (uriObject.tokenId === tokenId) {
+					uriObject.uri = newValue;
+					uriObject.status = Status.changedEntry;
 				}
 
-				return element;
+				return uriObject;
 			});
 		}
 	}
 
-    removeElement(tokenId: number|null) {
-		this.data = this.data
-			.map(element => {
-				if (element.tokenId === tokenId) {
-					if (element.status === Status.newEntry || element.status === Status.changedEntry) {
+    removeUriObject(tokenId: number|null) {
+		this.uriDataObjectList = this.uriDataObjectList
+			.map(uriObject => {
+				if (uriObject.tokenId === tokenId) {
+					if (uriObject.status === Status.newEntry || uriObject.status === Status.changedEntry) {
 						return undefined;
 					} else {
-						return { ...element, status: Status.deletedEntry };
+						return { ...uriObject, status: Status.deletedEntry };
 					}
 				} else {
-					return element;
+					return uriObject;
 				}
 			})
-			.filter((element): element is DataObject => element !== undefined);
+			.filter((uriObject): uriObject is UriDataObject => uriObject !== undefined);
     }
 
     render() {
@@ -277,7 +325,7 @@ export class ERC721OverrideURIForm extends ModuleForm {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th class="small-column">Status</th>
+                                        <th class="small-column"><span>Status</span></th>
                                         <th class="wide-column">Token ID</th>
                                         <th class="wide-column">Override URI</th>
                                         <th class="small-column"></th>
@@ -285,38 +333,38 @@ export class ERC721OverrideURIForm extends ModuleForm {
                                 </thead>
                                 <tbody>
                                     ${
-                                        this.data.length > 0
+                                        this.uriDataObjectList.length > 0
                                         ?
-                                            this.data.map(element => html`
+                                            this.uriDataObjectList.map(uriObject => html`
                                                 <tr>
                                                     <td class="small-column">
-                                                        <span class="circle" style="background-color: ${element.status}"></span>
+                                                        <span class="circle" style="background-color: ${uriObject.status}" title="${this.getStatusString(uriObject.status)}"></span>
                                                     </td>
                                                     <td class="wide-column">
 														${
-															element.status === Status.newEntry || element.status === Status.changedEntry
+															uriObject.status === Status.newEntry || uriObject.status === Status.changedEntry
 															?
-																html`<input type="number" @input=${(event: Event) => this.updateTokenId(event)} value=${element.tokenId || ''}></span>`
+																html`<input type="number" @change=${(event: Event) => this.updateTokenId(event)} value=${uriObject.tokenId || ''}/>`
 															:
-																html`<span>${element.tokenId}</span>`
+																html`<span>${uriObject.tokenId}</span>`
 														}
 													</td>
                                                     <td class="wide-column">
 														${
-															element.status === Status.newEntry || element.status === Status.changedEntry
+															uriObject.status !== Status.deletedEntry
 															?
-																html`<input type="text" @input=${(event: Event) => this.updateUri(element.tokenId, event)} value=${element.uri || ''}></span>`
+																html`<input type="text" @input=${(event: Event) => this.updateUri(uriObject.tokenId, event)} value=${uriObject.uri || ''}/>`
 															:
-																html`<span>${element.uri}</span>`
+																html`<span class="uri-text">${this.getFormattedUri(uriObject.uri)}</span>`
 														}
 													</td>
                                                     <td class="small-column">
-                                                        <span class="delete-button" @click=${() => this.removeElement(element.tokenId)}>&#10006;</span>
+                                                        <span class="delete-button" @click=${() => this.removeUriObject(uriObject.tokenId)}>&#10006;</span>
                                                     </td>
                                                 </tr>
                                             `)
                                         :
-											html`<span>no elements available</span>`
+											html`<span>no data available</span>`
                                     }
                                 </tbody>
                             </table>
@@ -327,12 +375,13 @@ export class ERC721OverrideURIForm extends ModuleForm {
                             Update
                         </kana-button-submit>
 
-                        <kana-button @click=${() => this.addElement({
+                        <kana-button @click=${() => this.addUriObject({
+							objectId: 3,
                             status: Status.newEntry,
                             tokenId: null,
                             uri: null
                         })}>
-                            Add Element
+                            Add Row
                         </kana-button>
                     </div>
                 </form>
