@@ -79,9 +79,9 @@ export const formCssCommon = [
         .form-new {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 20px;
 
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .form-element-new {
