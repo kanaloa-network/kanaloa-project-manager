@@ -316,10 +316,12 @@ export class ERC721Form extends ModuleForm {
             if (uriObject.objectId === objectId) {
                 uriObject.uri = newValue;
 
-                if (newValue === uriObject.initialUri) {
-                    uriObject.status = Status.oldEntry;
-                } else {
-                    uriObject.status = Status.changedEntry;
+                if (uriObject.status !== Status.newEntry) {
+                    if (newValue === uriObject.initialUri) {
+                        uriObject.status = Status.oldEntry;
+                    } else {
+                        uriObject.status = Status.changedEntry;
+                    }
                 }
             }
 
