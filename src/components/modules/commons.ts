@@ -71,7 +71,7 @@ export abstract class ModuleForm extends LitElement {
                     // Efficiency was clearly not what I was worried about here
                     // At this stage I prefer to occupy my mind with more
                     // trascendental matters than programming. Like anime booba
-                    (d, c) => ({ ...d, ...c })
+                    (d, c) => ({ ...d, ...c }), {}
                 )
         );
 

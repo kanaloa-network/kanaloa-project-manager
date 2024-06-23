@@ -2,6 +2,7 @@ import { LionForm } from "@lion/form";
 import { LionInput } from "@lion/input";
 import { LionOption, LionOptions } from'@lion/select-rich';
 import { LionSelect } from'@lion/select';
+import { LionTooltip } from '@lion/tooltip';
 import { LionInputStepper } from "@lion/input-stepper";
 import { customElement } from "lit/decorators.js";
 import { css, CSSResult } from "lit";
@@ -39,10 +40,11 @@ export const formCssCommon = [
             flex: 1;
             font-size: 1rem;
             position: relative;
+            font-family: Poppins;
         }
 
         input, select {
-            font-family: sans;
+            font-family: Poppins;
         }
 
         input {
@@ -74,17 +76,57 @@ export const formCssCommon = [
             flex-flow: row wrap;
         }
 
+        .form-new {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+
+            margin-top: 20px;
+        }
+
+        .form-element-new {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .form-column-new {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-row-new {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        label[slot="invoker"] {
+            cursor: pointer;
+        }
+
+        div[slot='content'] {
+            background-color: var(--highlighted-color);
+            color: var(--foreground-color);
+            padding: 6px;
+            font-size: 12px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px rgb(0 0 0 / 15%);
+        }
+
         select {
             padding: 10px;
             padding-right: 2rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             background-color: var(--primary-color);
             color: var(--foreground-color);
             font-size: 1rem;
             appearance: none;
             cursor: pointer;
             flex: 1;
+            font-size: 18px;
         }
         
         select:focus {
@@ -98,9 +140,15 @@ export const formCssCommon = [
             font-size: 1.2rem;
             min-height: 3rem;
         }
+
+        ::placeholder {
+            color: var(--foreground-color);
+            opacity: 0.6;
+        }
     `,
     css`
-        .form-row lion-validation-feedback {
+        .form-row lion-validation-feedback,
+        .form-element-new lion-validation-feedback {
             position: absolute;
             background-color: var(--highlighted-light-color);
             color: var(--background-color);
@@ -116,11 +164,13 @@ export const formCssCommon = [
             z-index: 1
         }
 
-        .form-row lion-validation-feedback:not([type="error"]) {
+        .form-row lion-validation-feedback:not([type="error"]),
+        .form-element-new lion-validation-feedback:not([type="error"]) {
             display: none;
         }
         
-        .form-row lion-validation-feedback::before {
+        .form-row lion-validation-feedback::before,
+        .form-element-new lion-validation-feedback::before {
             content: '';
             position: absolute;
             bottom: -18px;
@@ -141,11 +191,16 @@ export function maxLengthPreprocessor(maxLength: number = Infinity) {
 
 export function maxNumberPreprocessor(maxNumber: bigint) {
     return (value: string) => {
-        let sanitizedValue: bigint = BigInt(value.replace(/[^0-9]/g, ''));
-        if (sanitizedValue > maxNumber) {
-            sanitizedValue = maxNumber;
+        if (value !== "") {
+            let cutValue = value.split(".")[0];
+            let sanitizedValue: bigint = BigInt(cutValue.replace(/[^0-9]/g, ''));
+            if (sanitizedValue > maxNumber) {
+                sanitizedValue = maxNumber;
+            }
+            return sanitizedValue.toString();
+        } else {
+            return "";
         }
-        return sanitizedValue.toString();
     }
 }
 
@@ -227,6 +282,15 @@ export class KanaInputAmount extends LionInputAmount {
 // @ts-ignore
 @customElement("kana-input-stepper")
 export class KanaInputStepper extends LionInputStepper {
+    static override get styles() {
+        return [
+            flexifyCss
+        ]
+    }
+}
+
+@customElement("kana-tooltip")
+export class KanaTooltip extends LionTooltip {
     static override get styles() {
         return [
             flexifyCss

@@ -7,7 +7,6 @@ import { MaxUint256, ethers } from "ethers";
 import "../forms/pulpito/pulpito-input";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
 import { KanaloaAPI } from "../../api/kanaloa-ethers";
-import { LitElement } from "@lion/core";
 
 export const ERC20_FORM_TAG = 'erc20-form';
 @customElement(ERC20_FORM_TAG)

@@ -240,7 +240,11 @@ export class ContractPage extends LitElement {
     }
 
     render() {
+        if (this.modulesList.value != null) {
+            this.modulesList.value.baseModule = this.selectedBaseModule;            
+        }
         const forms = this.modulesList.value?.getSelectedModules().values();
+        
         return html`
             ${
                 when(
@@ -402,7 +406,6 @@ export class ContractBaseWindowlet extends KanaloaWindowlet {
                         }
                     </h2>
                     <hr />
-                    <label>Project info</label>
                     <div class="form-row">
                         <kana-input
                             id="root-name-input"

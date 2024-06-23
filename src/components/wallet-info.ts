@@ -34,12 +34,22 @@ export class KanaWalletInfo extends LitElement {
                 display: inline-block;
                 font-family: monospace;
             }
-			.menu-link {
-				text-decoration: none;
-				color: inherit;
-			}
+            .menu-link {
+                text-decoration: none;
+                color: inherit;
+            }
             kana-icon {
                 margin-left: 8px;
+
+                transition: all 300ms ease;
+                transition-property: opacity;
+
+                &:hover {
+                    opacity: 0.8;
+
+                    transition: all 300ms ease;
+                    transition-property: opacity;
+                }
             }
 
             a {

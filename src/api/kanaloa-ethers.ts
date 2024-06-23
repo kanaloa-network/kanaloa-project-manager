@@ -128,6 +128,33 @@ export class KanaloaEthers {
             );
     }
 
+    async switchChain(): Promise<undefined> {
+        const chainId = "0xa86a";
+
+        return (this.wallet as BrowserProvider).send("wallet_switchEthereumChain", [{ chainId: chainId }])
+            .catch(error => {
+                if (error !== undefined && error.message.includes("Unrecognized chain ID")) {
+                    return this.addChain();
+                }
+            });
+    }
+
+    async addChain() : Promise<undefined> {
+        const chain = {
+            chainId: "0xa86a",
+            chainName: "Avalanche",
+            nativeCurrency: {
+                name: "AVAX Token",
+                symbol: "AVAX",
+                decimals: 18
+            },
+            rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+            blockExplorerUrls: ["https://snowtrace.io"],
+        };
+
+        return (this.wallet as BrowserProvider).send("wallet_addEthereumChain", [chain]);
+    }
+
     subscribe(elem: LitElement) {
         elem.addEventListener(walletChangedEvent.type, requestUpdateSubscribers);
         this.subscribedElements.add(elem);
