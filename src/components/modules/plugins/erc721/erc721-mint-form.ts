@@ -1,7 +1,7 @@
 import { customElement } from "lit/decorators.js";
 import { ModuleForm } from "../../commons";
 import { html } from "lit";
-import { KanaForm, Required, maxNumberPreprocessor } from "../../../forms/forms";
+import { KanaForm, maxNumberPreprocessor } from "../../../forms/forms";
 import { MinNumber, MaxNumber, Validator } from "@lion/form-core";
 import { Contract, MaxUint256, ethers } from "ethers";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
@@ -25,7 +25,7 @@ class NotMintedYet extends Validator {
     }
 }
 
-export const ERC721_MINT_FORM_TAG = 'erc721_mint-test'; // erc721_mint is not working
+export const ERC721_MINT_FORM_TAG = 'erc721-mint';
 @customElement(ERC721_MINT_FORM_TAG)
 export class ERC721MintForm extends ModuleForm {
     static formAssociated = true;
@@ -49,10 +49,6 @@ export class ERC721MintForm extends ModuleForm {
     public erc721Form: ERC721Form | null = null; 
     setParent(ref: ModuleForm): void {
         this.erc721Form = ref as ERC721Form;
-    }
-
-    load(): Record<string, any> {
-        return [];
     }
 
     protected isValid(): boolean {
@@ -89,7 +85,6 @@ export class ERC721MintForm extends ModuleForm {
             return null;
         }
 
-        const model: any = form.modelValue;
         return {
             moduleSignature: this.moduleSignature,
             initParams: ethers.AbiCoder.defaultAbiCoder().encode(
@@ -114,20 +109,16 @@ export class ERC721MintForm extends ModuleForm {
                 ["function mint(address to, uint256 tokenId)"],
                 signer
             );
-        const params = [];
+        
         const tokenId = (this.modelValue as any)["tokenId"];
-
         if (tokenId === null || tokenId === "") {
             // TODO: give some warning about this being required
             return;
         } 
-
-        params.push(await signer?.getAddress())
-        params.push(tokenId);
         
         // TODO: block interaction on submit
         // TODO: unlock and clear on return
-        await contract["mint"](...params);
+        await contract.mint(await signer?.getAddress(), tokenId);
     }
 
     render() {
