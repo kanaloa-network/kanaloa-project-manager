@@ -1,11 +1,10 @@
 import { LitElement, html, css } from 'lit';
 import { Task } from '@lit/task';
 import { customElement } from 'lit/decorators.js';
-import "../components/forms/forms"
 import "../components/windowlet"
 import { MinMaxLength, Required } from "@lion/form-core"
 import { loadDefaultFeedbackMessages } from "@lion/validate-messages";
-import { KanaForm, maxLengthPreprocessor } from "../components/forms/forms";
+import { KanaForm, formCssCommon, maxLengthPreprocessor } from "../components/forms/forms";
 import { KanaloaAPI } from '../api/kanaloa-ethers';
 import { TaxableOperations } from '../api/payments-processor';
 import { LoadingIcon } from '../components/loader';
@@ -25,6 +24,7 @@ export class NewProjectPage extends LitElement {
 
     static get styles() {
         return [
+            ...formCssCommon,
             css`
                 :host {
                     display: flex;
@@ -32,7 +32,6 @@ export class NewProjectPage extends LitElement {
                     align-items: center;
                     gap: 2rem;
                     padding: 1rem;
-                    flex: 1 1 0%;
                 }
 
                 h1 {
@@ -47,6 +46,7 @@ export class NewProjectPage extends LitElement {
                 }
 
                 h3 {
+                    opacity: 0.8;
                     font-size: 1.5rem;
                     margin: 0;
                 }
@@ -55,121 +55,36 @@ export class NewProjectPage extends LitElement {
                     border: none;
                     height: 2px;
                     background-color: var(--background-light-color);
-                    margin: 0.5rem 0 1rem;
-                }
-
-                kana-input, input, kana-select {
-                    flex: 1;
-                    font-size: 1rem;
-                    position: relative;
-                }
-
-                input, select {
-                    font-family: sans;
-                }
-
-                input {
-                    padding: 10px;
-                    border: none;
-                    border-radius: 5px;
-                    background-color: var(--primary-color);
-                    color: var(--foreground-color);
-                    box-sizing: border-box;
-                }
-                
-                input:focus {
-                    outline: none;
-                    box-shadow: 0 0 0 2px var(--highlighted-light-color);
-                }
-
-                .small-input, .small-input * {
-                    flex: 0;
-                }
-
-                .small-input input {
-                    width: 8rem;
-                }
-
-                .form-row {
-                    display: flex;
-                    gap: 1rem;
-                    margin: 10px 0;
-                    flex-flow: row wrap;
-                }
-
-                select {
-                    padding: 10px;
-                    padding-right: 2rem;
-                    border: none;
-                    border-radius: 5px;
-                    background-color: var(--primary-color);
-                    color: var(--foreground-color);
-                    font-size: 1rem;
-                    appearance: none;
-                    cursor: pointer;
-                    flex: 1;
-                }
-                
-                select:focus {
-                    outline: none;
-                    box-shadow: 0 0 0 2px var(--highlighted-light-color);
-                }
-                
-                span {
-                    margin-left: 10px;
-                }
-                       
-                kana-button-submit {
-                    min-width: fit-content;
-                    flex: 1;
-                    font-size: 1.2rem;
-                    min-height: 3rem;
+                    margin: 1.5rem 0 1.5rem;
                 }
 
                 kana-windowlet {
-                    max-width: 32rem;
-                    flex: 0 1 auto;
-                }
-            `,
-            // There has to be a better place to put this, but I will figure 
-            // that out later
-            css`
-                .form-row lion-validation-feedback {
-                    position: absolute;
-                    background-color: var(--highlighted-light-color);
-                    color: var(--background-color);
-                    padding: 10px;
-                    border-radius: 10px;
-                    display: inline-block;
-                    max-width: 12rem;
-                    font-size: 0.8rem;
-                    line-height: 1.2;
-                    bottom: 2rem;
-                    margin-left: -3rem;
-                    width: max-content;
-                    z-index: 1
-                }
+                    display: flex;
+                    flex-direction: column;
+                    width: fit-content;
+                    min-width: 500px;
 
-                .form-row lion-validation-feedback:not([type="error"]) {
-                    display: none;
+                    @media only screen and (max-width: 900px) {
+                        min-width: auto;
+                        width: 100%;
+                    }
                 }
-                
-                .form-row lion-validation-feedback::before {
-                    content: '';
-                    position: absolute;
-                    bottom: -18px;
-                    left: 10%;
-                    margin-left: -10px;
-                    border: 10px solid transparent;
-                    border-top: 15px solid var(--highlighted-light-color);
-                }
-                
             `
         ];
     }
 
     async submitHandler(ev: any) {
         let form: KanaForm = ev.target;
+        let buttonText = (form.querySelector("kana-button-submit")!.children[0] as HTMLElement).innerText;
+
+        if (buttonText === "Switch your Chain") {
+            KanaloaAPI.switchChain().then(() => {
+                window.location.reload();
+            });
+
+            return;
+        }
+
         if (form.hasFeedbackFor.includes('error')) {
           const firstFormElWithError = form.formElements.find(
                 (el: any) => el.hasFeedbackFor.includes('error'),
@@ -223,10 +138,26 @@ export class NewProjectPage extends LitElement {
     );
 
     render() {
-        const cost = this.calculatedCost.render({
-            pending: () => html`<span><loading-icon size="1em"><loading-icon></span>`,
-            complete: (value) => html`<span>(${value / 10n ** 18n} $KANA)</span>`,
-            error: (error) => html`<p>(${error} ????)</p>`,
+        const submitButtonContent = this.calculatedCost.render({
+            pending: () => {
+                return html`<span><loading-icon size="1em"><loading-icon></span>`
+            },
+            complete: (value) => {
+                const formattedValue = value / 10n ** 18n;
+
+                return html`<span>Deploy New Project (${formattedValue} $KANA)</span>`;
+            },
+            error: (error) => {
+                console.log(error);
+
+                let errorMessage = "Error";
+
+                if ((error as Error).message.includes("could not decode result data")) {
+                    errorMessage = "Switch your Chain";
+                }
+
+                return html`<span>${errorMessage}</span>`;
+            },
         });
 
         return html`
@@ -274,7 +205,7 @@ export class NewProjectPage extends LitElement {
                         </div>
                         <div class="form-row">
                             <kana-button-submit>
-                                Deploy new project ${cost}
+                                ${submitButtonContent}
                             </kana-button-submit>
                         </div>
                     </form>

@@ -1,11 +1,13 @@
 import { customElement } from "lit/decorators.js";
 import { ModuleForm } from "../../commons";
-import { html } from "lit";
+import { css, html } from "lit";
 import { KanaForm, KanaInputAmount, Required, maxNumberPreprocessor } from "../../../forms/forms";
 import { MinNumber, MaxNumber, Validator } from "@lion/form-core";
-import { MaxUint256, ethers } from "ethers";
+import { Contract, MaxUint256, ethers } from "ethers";
 import { ModuleParameters } from "src/api/kanaloa-project-registry";
 import { ERC20Form } from "../../erc20-form";
+import { ContractPage } from "src/pages/contract-page";
+import { KanaloaAPI } from "../../../../api/kanaloa-ethers";
 
 class EqualOrMoreThan extends Validator {
     static get validatorName() {
@@ -25,6 +27,17 @@ export const ERC20_MINT_BURN_FORM_TAG = 'erc20_mint-burn';
 @customElement(ERC20_MINT_BURN_FORM_TAG)
 export class ERC20MintBurnForm extends ModuleForm {
     static formAssociated = true;
+
+    static override get styles() {
+        return [
+            ...super.styles,
+            css`
+                kana-button-submit {
+                    width: 100%;
+                }
+            `
+        ];
+    }
 
     constructor() {
         super();
@@ -62,11 +75,11 @@ export class ERC20MintBurnForm extends ModuleForm {
         return d;
     }
     
-    async compileModuleParameters(root: any): Promise<ModuleParameters | null> {
+    protected isValid(): boolean {
         const form = this.kanaForm;
 
         if (form == null) {
-            return null;
+            return false;
         }
 
         form.formElements.forEach(
@@ -79,6 +92,20 @@ export class ERC20MintBurnForm extends ModuleForm {
                     (el: any) => el.hasFeedbackFor.includes('error'),
             );
             firstFormElWithError.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    async compileModuleParameters(root: any): Promise<ModuleParameters | null> {
+        const form = this.kanaForm;
+
+        if (form == null) {
+            return null;
+        }
+
+        if (this.isValid() == false) {
             return null;
         }
 
@@ -98,12 +125,55 @@ export class ERC20MintBurnForm extends ModuleForm {
         };
     }
 
+    async actionHandler(ev: Event) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        if (this.isValid() == false) {
+            return;
+        }
+
+        const action = (ev.target as HTMLElement).getAttribute("value") || "";
+        const signer = await KanaloaAPI.signer;
+        const contract = 
+            new Contract(
+                ((this.getRootNode() as ShadowRoot).host as ContractPage).contract!,
+                [ 
+                    `function ${action}(` +
+                        `${(action == "mint") ? "address to, " : ""}` +
+                        `uint256 amount` +
+                    `)` 
+                ],
+                signer
+            );
+        const params = [];
+        const amount = (this.modelValue as any)[`${action}Amount`];
+
+        if (amount == null || amount == "" || amount == 0) {
+            // TODO: give some warning about this being required
+            return;
+        } 
+
+        if (action == "mint") {
+            params.push(await signer?.getAddress())
+        }
+        params.push(amount);
+        
+        // TODO: block interaction on submit
+        // TODO: unlock and clear on return
+        await contract[action](...params);
+    }
+
     render() {
+        const isInstalled = 
+            ((this.getRootNode() as ShadowRoot).host as ContractPage)
+                .modulesList
+                .value?.onchainModules[this.moduleSignature] != null;
         return html`
             <hr>
             <h3>Basic mint and burn for ERC20</h3>
-            <kana-form>
-                <form>
+            <kana-form @submit="${(ev: Event) => ev.preventDefault()}">
+                <form @submit=${(ev: Event) => ev.preventDefault()}>
                     <div class="form-row">
                         <span>
                             <label>Maximum supply</label>
@@ -128,6 +198,72 @@ export class ERC20MintBurnForm extends ModuleForm {
                                 .preprocessor=${maxNumberPreprocessor(MaxUint256)}
                                 ?readonly=${this.loadedRawData != null}
                             ></kana-input-amount>
+                        </span>
+                    </div>
+                    <div class="form-row">
+                        <span>
+                            <label>Mint amount</label>
+                            <br>
+                            <kana-input-amount
+                                label-sr-only="Mint amount"
+                                placeholder="100000"
+                                name="mintAmount"
+                                .validators="${[
+                                    new MinNumber(1),
+                                    new MaxNumber(MaxUint256),
+                                    // new EqualOrMoreThan(
+                                    //     this.erc20Form, 
+                                    //     // TODO: fix this so it checks total supply + mint <= max supply
+                                    //     { 
+                                    //         getMessage: 
+                                    //             () => "Mint amount cannot be larger than maximum supply" 
+                                    //     }
+                                    // )
+                                ]}"
+                                .preprocessor=${maxNumberPreprocessor(MaxUint256)}
+                                ?readonly=${!isInstalled}
+                            ></kana-input-amount>
+                            <br>
+                            <kana-button-submit
+                                @click=${this.actionHandler}
+                                name="supplyAction"
+                                value="mint"
+                                ?disabled=${!isInstalled}
+                            >
+                                Mint
+                            </kana-button-submit>
+                        </span>
+                        <span>
+                            <label>Burn amount</label>
+                            <br>
+                            <kana-input-amount
+                                label-sr-only="Burn amount"
+                                placeholder="100000"
+                                name="burnAmount"
+                                .validators="${[
+                                    new MinNumber(1),
+                                    new MaxNumber(MaxUint256),
+                                    // new EqualOrMoreThan(
+                                    //     this.erc20Form, 
+                                    //     // TODO: fix this so it checks total supply - burn >= 0
+                                    //     { 
+                                    //         getMessage: 
+                                    //             () => "Burn amount cannot be larger than total supply" 
+                                    //     }
+                                    // )
+                                ]}"
+                                .preprocessor=${maxNumberPreprocessor(MaxUint256)}
+                                ?readonly=${!isInstalled}
+                            ></kana-input-amount>
+                            <br>
+                            <kana-button-submit
+                                @click=${this.actionHandler}
+                                name="supplyAction"
+                                value="burn"
+                                ?disabled=${!isInstalled}
+                            >
+                                Burn
+                            </kana-button-submit>
                         </span>
                     </div>
             </kana-form>
